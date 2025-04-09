@@ -1,0 +1,37 @@
+{
+	"name": "randsand",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"format": "prettier --write .",
+		"lint": "prettier --check .",
+		"db:push": "drizzle-kit push",
+		"db:migrate": "drizzle-kit migrate",
+		"db:studio": "drizzle-kit studio"
+	},
+	"devDependencies": {
+		"@fontsource/fira-mono": "^5.0.0",
+		"@neoconfetti/svelte": "^2.0.0",
+		"@sveltejs/adapter-auto": "^4.0.0",
+		"@sveltejs/kit": "^2.16.0",
+		"@sveltejs/vite-plugin-svelte": "^5.0.0",
+		"@tailwindcss/forms": "^0.5.9",
+		"@tailwindcss/vite": "^4.0.0",
+		"@types/better-sqlite3": "^7.6.12",
+		"drizzle-kit": "^0.30.2",
+		"prettier": "^3.4.2",
+		"prettier-plugin-svelte": "^3.3.3",
+		"svelte": "^5.25.0",
+		"tailwindcss": "^4.0.0",
+		"vite": "^6.2.5"
+	},
+	"dependencies": {
+		"better-sqlite3": "^11.8.0",
+		"drizzle-orm": "^0.40.0"
+	}
+}
