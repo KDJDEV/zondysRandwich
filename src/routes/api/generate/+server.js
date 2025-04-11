@@ -3,7 +3,6 @@ import optionsData from '$lib/data/options.json';
 import OpenAI from "openai";
 import 'dotenv/config'
 import { db } from "$lib/db";
-import { count } from 'drizzle-orm';
 import { sandwiches } from "$lib/db/schema";
 
 function getRandomSandwich(data) {
@@ -44,8 +43,7 @@ Toppings: ${sandwich.toppings.join(", ")}
     return name;
 }
 
-
-export const GET = async (event) => {
+export const POST = async (event) => {
 	const user = event.locals?.user;
 
 	if (!user) {
@@ -55,18 +53,20 @@ export const GET = async (event) => {
 	let sandwich = getRandomSandwich(optionsData);
 	let name = await generateSandwichName(sandwich);
 
-	await db.insert(sandwiches).values({
-		bread: sandwich.bread,
-        name:name,
-		protein: sandwich.protein,
-		cheese: sandwich.cheese,
-		toppings: sandwich.toppings,
-		userId: user.id
-	});
+	const result = await db.insert(sandwiches).values({
+        bread: sandwich.bread,
+        name: name,
+        protein: sandwich.protein,
+        cheese: sandwich.cheese,
+        toppings: sandwich.toppings,
+        userId: user.id
+    }).returning({ insertedId: sandwiches.id });
+    
+    const insertedId = result[0]?.insertedId;
 
 	return json({
 		...sandwich,
 		name,
-		number: 1
+		id: insertedId
 	});
 };

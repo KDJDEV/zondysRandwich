@@ -48,6 +48,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@neoconfetti/svelte": "^2.2.2",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
     "bcryptjs": "^3.0.2",

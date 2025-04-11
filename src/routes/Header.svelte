@@ -49,7 +49,7 @@
 	<div class="max-w-screen-md mx-auto flex items-center py-2">
 		<h1>
 			<a href="/" class="btn btn-ghost gap-3">
-				<span class=" text-3xl">🥪</span>
+				<img src="/favicon.png" class="w-10 h-10"/>
 				Zondy's Randomizer
 			</a>
 		</h1>
