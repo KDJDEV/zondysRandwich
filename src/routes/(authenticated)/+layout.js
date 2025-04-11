@@ -15,12 +15,12 @@ export async function load(event) {
     log("session_user:", session_user);
 
     const user = session_user || locals_user || parent_user;
-
+    
     log("user:", user);
 
     if (!user) {
         log("no user, redirecting to /login");
-        throw redirect(301, "/login");
+        throw redirect(301, "/login2");
     }
     return { user };
 }

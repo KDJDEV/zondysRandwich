@@ -71,6 +71,7 @@ export const actions = {
 
         
         const user = login_resp.value;
+        delete user.password;
         /*
         if (user?.id && user?.token) {
             // TODO: duplicated in login page

@@ -26,9 +26,11 @@ export const actions = {
         }
 
         const user = resp.value;
+        delete user.password;
 
         log("user:", user);
 
+        /*
         if (user && user.token) {
             // TODO: duplicated in login page
             event.cookies.set("auth_token", `${user.id}:${user.token}`, {
@@ -37,9 +39,9 @@ export const actions = {
             });
         }
 
-        log("redirecting user...");
+        */
 
-        delete user.token;
+        log("redirecting user...");
 
         return { user };
     },

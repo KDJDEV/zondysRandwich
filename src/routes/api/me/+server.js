@@ -13,5 +13,5 @@ export const GET = (event) => {
 
     if (!user) return json({ error: "not authorized" }, { status: 401 });
 
-    return json({ id: user.id, email: user.email });
+    return json({ id: user.id, username:user.username, email: user.email });
 };
