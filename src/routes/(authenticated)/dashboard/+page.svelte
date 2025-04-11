@@ -4,7 +4,7 @@
 
 <section class="prose">
     <h1>Dashboard</h1>
-    <p>🎉 Hello there <strong>{data.user?.email}</strong>, you're logged in!</p>
+    <p>🎉 Hello there <strong>{data.user?.username}</strong>, you're logged in!</p>
     <ul>
         <li><a href="/settings">Settings</a> - Another authenticated route.</li>
         <li>

@@ -45,7 +45,7 @@
 		  ];
 </script>
 
-<header class=" bg-purple-900 px-6 text-base-100">
+<header class=" bg-primary px-6 text-base-100">
 	<div class="max-w-screen-md mx-auto flex items-center py-2">
 		<h1>
 			<a href="/" class="btn btn-ghost gap-3">
@@ -61,7 +61,7 @@
 			</label>
 			<ul
 				tabindex="0"
-				class="dropdown-content menu p-2 shadow-md bg-base-200 rounded-box w-52 "
+				class="dropdown-content menu p-2 shadow-md bg-primary rounded-box w-52 "
 			>
 				{#each menu_items as item}
 					<li>
