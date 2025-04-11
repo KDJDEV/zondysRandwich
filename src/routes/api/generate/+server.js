@@ -1,5 +1,10 @@
 import { json } from "@sveltejs/kit";
 import optionsData from '$lib/data/options.json';
+import OpenAI from "openai";
+import 'dotenv/config'
+import { db } from "$lib/db";
+import { count } from 'drizzle-orm';
+import { sandwiches } from "$lib/db/schema";
 
 function getRandomSandwich(data) {
     const randomItem = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -14,14 +19,54 @@ function getRandomSandwich(data) {
     };
 }
 
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
 
-export const GET = (event) => {
-    const user = event.locals?.user;
+async function generateSandwichName(sandwich) {
+    const prompt = `
+Given the sandwich ingredients below, respond with only a creative and unique name for the sandwich. Output only the name and nothing else.
 
-    if (!user) return json({ error: "not authorized" }, { status: 401 });
+Bread: ${sandwich.bread}
+Protein: ${sandwich.protein}
+Cheese: ${sandwich.cheese}
+Toppings: ${sandwich.toppings.join(", ")}
+`;
 
-    const sandwich = getRandomSandwich(optionsData);
-    console.log(sandwich);
+    const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini-2024-07-18",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.8,
+        max_tokens: 20,
+    });
 
-    return json(sandwich);
+    const name = response.choices[0].message.content.trim();
+    return name;
+}
+
+
+export const GET = async (event) => {
+	const user = event.locals?.user;
+
+	if (!user) {
+		return json({ error: 'not authorized' }, { status: 401 });
+	}
+
+	let sandwich = getRandomSandwich(optionsData);
+	let name = await generateSandwichName(sandwich);
+
+	await db.insert(sandwiches).values({
+		bread: sandwich.bread,
+        name:name,
+		protein: sandwich.protein,
+		cheese: sandwich.cheese,
+		toppings: sandwich.toppings,
+		userId: user.id
+	});
+
+	return json({
+		...sandwich,
+		name,
+		number: 1
+	});
 };

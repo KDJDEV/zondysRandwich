@@ -20,6 +20,7 @@ export const sessions = pgTable("session", {
 
 export const sandwiches = pgTable('sandwiches', {
 	id: serial('id').primaryKey(),
+	name: text('name'),
 	bread: text('bread'),
 	protein: text('protein'),
 	cheese: text('cheese'),
