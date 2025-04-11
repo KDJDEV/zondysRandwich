@@ -45,11 +45,11 @@
 		  ];
 </script>
 
-<header class=" bg-purple-900 px-6">
+<header class=" bg-purple-900 px-6 text-base-100">
 	<div class="max-w-screen-md mx-auto flex items-center py-2">
 		<h1>
 			<a href="/" class="btn btn-ghost gap-3">
-				<Fa icon={faRocket} />
+				<span class=" text-3xl">🥪</span>
 				Zondy's Randomizer
 			</a>
 		</h1>

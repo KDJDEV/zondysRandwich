@@ -26,11 +26,11 @@
 	</p>
 	<p class="flex items-center gap-4 mt-12">
 		{#if $session?.user}
-			<a href="/dashboard" class="btn btn-primary">Dashboard</a>
-			<a href="/settings" class="btn">Settings</a>
+			<a href="/dashboard" class="btn btn-primary text-base-100">Dashboard</a>
+			<a href="/settings" class="btn text-base-100">Settings</a>
 		{:else}
-			<a href="/signup" class="btn btn-primary">Sign Up</a>
-			<a href="/login" class="btn">Log In</a>
+			<a href="/signup" class="btn btn-primary text-base-100">Sign Up</a>
+			<a href="/login" class="btn text-base-100">Log In</a>
 		{/if}
 	</p>
 </div>
