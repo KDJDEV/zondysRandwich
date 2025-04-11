@@ -45,12 +45,12 @@
 		  ];
 </script>
 
-<header class="bg-base-200 px-6">
+<header class=" bg-purple-900 px-6">
 	<div class="max-w-screen-md mx-auto flex items-center py-2">
 		<h1>
 			<a href="/" class="btn btn-ghost gap-3">
 				<Fa icon={faRocket} />
-				SvelteKit Auth
+				Zondy's Randomizer
 			</a>
 		</h1>
 

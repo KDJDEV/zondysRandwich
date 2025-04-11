@@ -20,7 +20,7 @@
 </script>
 
 <svelte:head>
-	<title>{title}SvelteKit Auth Demo</title>
+	<title>{title}Zondy's Randomizer</title>
 </svelte:head>
 
 <Header />

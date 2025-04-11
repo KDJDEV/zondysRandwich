@@ -3,7 +3,7 @@
 </script>
 
 <div class="prose">
-	<h1>SvelteKit Auth Example</h1>
+	<h1>Zondy's Randomizer</h1>
 	<p>
 		This project shows you how to implement a simple authentication system using
 		SvelteKit.
