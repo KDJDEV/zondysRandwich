@@ -8,6 +8,7 @@
 		faRocket,
 		faSignIn,
 		faSignOut,
+		faBook
 	} from "@fortawesome/free-solid-svg-icons";
 	import Fa from "svelte-fa";
 	import "../app.postcss";
@@ -20,9 +21,9 @@
 					label: "Dashboard",
 				},
 				{
-					href: "/settings",
-					icon: faCog,
-					label: "Settings",
+					href: "/dashboard/history",
+					icon: faBook,
+					label: "Sandwich History",
 				},
 				{
 					href: "/logout",

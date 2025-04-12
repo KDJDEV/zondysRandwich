@@ -1,4 +1,4 @@
-import { pgTable, serial, text, varchar, integer, foreignKey, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, varchar, integer, timestamp } from "drizzle-orm/pg-core";
 
 export const users = pgTable('users', {
 	id: serial('id').primaryKey(),
@@ -20,13 +20,14 @@ export const sessions = pgTable("session", {
 
 export const sandwiches = pgTable('sandwiches', {
 	id: serial('id').primaryKey(),
-    name: text('name'),
-    bread: text('bread'),
-    protein: text('protein'),
-    cheese: text('cheese'),
-    toppings: text('toppings').array(),
-    userId: integer('user_id').notNull().references(() => users.id),
-    comments: text('comments'),
-    starRating: integer('star_rating'),
-    imageUrl: varchar('image_url', { length: 512 })
+	name: text('name'),
+	bread: text('bread'),
+	protein: text('protein'),
+	cheese: text('cheese'),
+	toppings: text('toppings').array(),
+	userId: integer('user_id').notNull().references(() => users.id),
+	comments: text('comments'),
+	starRating: integer('star_rating'),
+	imageUrl: varchar('image_url', { length: 512 }),
+	createdAt: timestamp('created_at').defaultNow().notNull(),
 });

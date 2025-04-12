@@ -41,12 +41,16 @@
 		</p>
 	{/if}
 
-	<h1>Dashboard <a
-		href="/dashboard/history"
-		class="inline text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
-	>
-		View My Sandwich History
-	</a></h1>
+	<h1 class="flex items-center gap-4">
+		Dashboard
+		<a
+			href="/dashboard/history"
+			class="text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+		>
+			View My Sandwich History
+		</a>
+	</h1>
+	
 	<p>
 		🎉 Hello there <strong>{data.user?.username}</strong>, you're logged in!
 	</p>

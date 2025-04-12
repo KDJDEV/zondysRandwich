@@ -34,14 +34,7 @@
 				>
 					<h2 class="text-xl font-bold mb-2">{sandwich.name}</h2>
 					<p class="text-sm text-gray-600">
-						<strong>Bread:</strong>
-						{sandwich.bread}<br />
-						<strong>Protein:</strong>
-						{sandwich.protein}<br />
-						<strong>Cheese:</strong>
-						{sandwich.cheese}<br />
-						<strong>Toppings:</strong>
-						{sandwich.toppings.join(", ")}
+						{new Date(sandwich.createdAt).toLocaleDateString()}
 					</p>
 
 					{#if sandwich.starRating && sandwich.imageUrl}

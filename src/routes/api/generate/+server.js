@@ -59,14 +59,15 @@ export const POST = async (event) => {
         protein: sandwich.protein,
         cheese: sandwich.cheese,
         toppings: sandwich.toppings,
-        userId: user.id
-    }).returning({ insertedId: sandwiches.id });
+        userId: user.id,
+    }).returning({ insertedId: sandwiches.id, createdAt:sandwiches.createdAt });
     
     const insertedId = result[0]?.insertedId;
-
+    const createdAt = result[0]?.createdAt;
 	return json({
 		...sandwich,
 		name,
-		id: insertedId
+		id: insertedId,
+        createdAt:createdAt
 	});
 };

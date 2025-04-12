@@ -4,6 +4,8 @@
 	// @ts-ignore
 	import StarRating from "$lib/components/StarRating.svelte";
 	import PhotoUpload from "$lib/components/PhotoUpload.svelte";
+	import Fa from "svelte-fa";
+	import { faWarning } from "@fortawesome/free-solid-svg-icons";
 	import { goto } from "$app/navigation";
 
 	$: created = $page.url.searchParams.get("created") === "true";
@@ -25,14 +27,20 @@ Thank you!`;
 	let rating = "";
 	let comments = "";
 	let photoUrl = "";
-
+	let error = "";
 	function handlePhotoUpload(url) {
 		photoUrl = url;
 	}
 
 	async function submitRating() {
-		if (!rating || !photoUrl) {
-			return; // Optionally, show a message that rating and photo are required
+		error = "";
+		if (!rating) {
+			error = "Please select a star rating.";
+			return;
+		}
+		if (!photoUrl) {
+			error = "Please upload a photo.";
+			return;
 		}
 
 		try {
@@ -87,7 +95,7 @@ Thank you!`;
 		{/if}
 	{/if}
 	<div class=" text-center">
-		<p class="text-gray-500 text-sm">Sandwich #{sandwich.id}</p>
+		<p class="text-gray-500 text-sm">Sandwich #{sandwich.id} ({new Date(sandwich.createdAt).toLocaleDateString()})</p>
 		<h1 class=" text-2xl font-bold">🔥 {sandwich.name} 🔥</h1>
 
 		<p><strong>🥖 Bread:</strong> {sandwich.bread}</p>
@@ -99,7 +107,12 @@ Thank you!`;
 		</p>
 		<hr class="mt-3" />
 		{#if !ordered}
-			<p class="mt-3 font-bold">Here's what you can say to order{(data.user?.id === sandwich.userId) && alreadyInDB ? " again" : ""}:</p>
+			<p class="mt-3 font-bold">
+				Here's what you can say to order{data.user?.id === sandwich.userId &&
+				alreadyInDB
+					? " again"
+					: ""}:
+			</p>
 			<div
 				class="border-2 border-dashed border-primary p-4 my-4 rounded-lg bg-base-100 text-left"
 			>
@@ -136,6 +149,14 @@ Thank you!`;
 				<div
 					class="border-2 border-dashed border-primary p-4 my-4 rounded-lg bg-base-100 text-left"
 				>
+					{#if error}
+						<div class="alert alert-error mb-2">
+							<div>
+								<Fa icon={faWarning} />
+								{error}
+							</div>
+						</div>
+					{/if}
 					<StarRating bind:rate={rating} />
 					{#if rating}
 						<p>{rating} Stars</p>
@@ -160,7 +181,6 @@ Thank you!`;
 					<button
 						class="generate mt-5 m-auto block mb-3"
 						on:click={submitRating}
-						disabled={!rating || !photoUrl}
 					>
 						Submit rating
 					</button>
