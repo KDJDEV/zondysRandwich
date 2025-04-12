@@ -4,6 +4,10 @@ import sharp from 'sharp'; // Import sharp for image processing
 import crypto from 'crypto'; // Import crypto for generating random hashes
 import 'dotenv/config';
 
+export const config = {
+    runtime: 'nodejs',
+};
+
 const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -50,8 +54,4 @@ export const POST = async ({ request }) => {
     } catch (err) {
         return json({ error: 'Server error' }, { status: 500 });
     }
-};
-
-export const config = {
-    runtime: 'nodejs',
 };
