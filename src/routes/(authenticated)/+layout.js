@@ -20,7 +20,7 @@ export async function load(event) {
 
     if (!user) {
         log("no user, redirecting to /login");
-        throw redirect(301, "/login2");
+        throw redirect(301, "/login");
     }
     return { user };
 }

@@ -5,24 +5,22 @@
 <div class="prose">
 	<h1>Zondy's Randomizer</h1>
 	<p>
-		This project shows you how to implement a simple authentication system using
-		SvelteKit.
+		Can't decide what to get? Tired of ordering the same sandwich every time?
+		Let chance choose your next delicious bite. We believe sandwiches should be exciting. Whether you're
+		bold enough to try something completely unexpected or just looking to mix up
+		your usual lunch routine, the Sandwich Randomizer is here for you.
 	</p>
+
+	<h2 class="mt-0">How it works:</h2>
+	<ol>
+		<li>Create an account.</li>
+		<li>Generate a sandwich from the Dashboard.</li>
+		<li>Order it. Upload a picture of it. Eat it. Love it.</li>
+		<li>Give it a review.</li>
+	</ol>
+
 	<p>
-		<a
-			href="https://github.com/danawoodman/sveltekit-auth-example"
-			target="_blank"
-			rel="noopen">Checkout the source code here</a
-		>.
-	</p>
-	<p>
-		This demo doesn't use a database and instead just stores user data in a
-		server-side cookie. This is just for demo purposes. In your application
-		you'd want to connect to some backend system instead.
-	</p>
-	<p>
-		Try signing up, loggin out, then logging in with that same user credentials
-		then try and API request.
+		Also check out the leaderboard to see how many random sandwiches you've eaten comapared to others!
 	</p>
 	<p class="flex items-center gap-4 mt-12">
 		{#if $session?.user}

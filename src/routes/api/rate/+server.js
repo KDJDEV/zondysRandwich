@@ -3,6 +3,11 @@ import { db } from "$lib/db";
 import { sandwiches } from "$lib/db/schema";
 import { eq } from "drizzle-orm";
 
+function isValidSandwichUrl(url) {
+	const regex = /^https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\/sandwiches\/uploads\/[a-f0-9]{32}\.jpg$/;
+	return regex.test(url);
+}
+
 export const PATCH = async (event) => {
 	const user = event.locals?.user;
 
@@ -20,7 +25,10 @@ export const PATCH = async (event) => {
 	if (starRating !== undefined && ![1, 2, 3, 4, 5].includes(starRating)) {
 		return json({ error: "starRating must be an integer from 1 to 5" }, { status: 400 });
 	}
-
+	if (!isValidSandwichUrl(imageUrl)) {
+		return json({ error: "imageUrl must be valid" }, { status: 400 });
+	}
+	
 	try {
 		await db
 			.update(sandwiches)

@@ -27,6 +27,9 @@ export const GET = async ({ params, locals }) => {
 			toppings: sandwiches.toppings,
 			userId: sandwiches.userId,
 			username: users.username,
+			imageUrl: sandwiches.imageUrl,
+			starRating: sandwiches.starRating,
+			comments: sandwiches.comments
 		})
 		.from(sandwiches)
 		.where(eq(sandwiches.id, id))

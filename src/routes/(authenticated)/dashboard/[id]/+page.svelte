@@ -11,14 +11,13 @@
 	export let data;
 
 	const { sandwich } = data;
-
-	$: toppingsText = sandwich.toppings?.length
-		? sandwich.toppings.slice(0, -1).join(", ") +
-		  (sandwich.toppings.length > 1 ? ", and " : "") +
-		  sandwich.toppings.slice(-1)
+	$: toppingsText = sandwich?.toppings?.length
+		? sandwich?.toppings.slice(0, -1).join(", ") +
+		  (sandwich?.toppings.length > 1 ? ", and " : "") +
+		  sandwich?.toppings.slice(-1)
 		: "no toppings";
 
-	$: orderText = `I would like ${sandwich.cheese} and ${sandwich.protein} on ${sandwich.bread}.\n
+	$: orderText = `I would like ${sandwich?.cheese} and ${sandwich?.protein} on ${sandwich?.bread}.\n
 For toppings I would like ${toppingsText}.\n
 Thank you!`;
 
@@ -32,35 +31,37 @@ Thank you!`;
 	}
 
 	async function submitRating() {
-	  if (!rating || !photoUrl) {
-		return; // Optionally, show a message that rating and photo are required
-	  }
-  
-	  try {
-		const response = await fetch(`/api/rate`, {
-		  method: "PATCH",
-		  headers: {
-			"Content-Type": "application/json",
-		  },
-		  body: JSON.stringify({
-			id: sandwich.id,
-			comments,
-			starRating: parseInt(rating),
-			imageUrl: photoUrl,
-		  }),
-		});
-  
-		const result = await response.json();
-  
-		if (result.success) {
-		  goto("/dashboard?success=true");
-		} else {
-		  console.error("Failed to submit rating", result.error);
+		if (!rating || !photoUrl) {
+			return; // Optionally, show a message that rating and photo are required
 		}
-	  } catch (error) {
-		console.error("Error submitting rating", error);
-	  }
+
+		try {
+			const response = await fetch(`/api/rate`, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					id: sandwich.id,
+					comments,
+					starRating: parseInt(rating),
+					imageUrl: photoUrl,
+				}),
+			});
+
+			const result = await response.json();
+
+			if (result.success) {
+				goto("/dashboard?success=true");
+			} else {
+				console.error("Failed to submit rating", result.error);
+			}
+		} catch (error) {
+			console.error("Error submitting rating", error);
+		}
 	}
+
+	$: alreadyInDB = sandwich?.starRating;
 </script>
 
 {#if sandwich}
@@ -74,10 +75,16 @@ Thank you!`;
 			/>
 		</div>
 	{/if}
-	{#if data.user?.id === sandwich.userId}
-		Here's your sandwich:
-	{:else}
-		{sandwich.username}'s sandwich:
+	{#if alreadyInDB}
+		{#if data.user?.id === sandwich.userId}
+			<p class="text-green-500 font-bold mb-2 text-center">
+				You've ordered this sandwich before!
+			</p>
+		{:else}
+			<p class="text-green-500 font-bold mb-2 text-center">
+				{sandwich.username} has ordered this sandwich before!
+			</p>
+		{/if}
 	{/if}
 	<div class=" text-center">
 		<p class="text-gray-500 text-sm">Sandwich #{sandwich.id}</p>
@@ -92,17 +99,36 @@ Thank you!`;
 		</p>
 		<hr class="mt-3" />
 		{#if !ordered}
-			<p class="mt-3 font-bold">Here's what you can say to order:</p>
+			<p class="mt-3 font-bold">Here's what you can say to order{(data.user?.id === sandwich.userId) && alreadyInDB ? " again" : ""}:</p>
 			<div
 				class="border-2 border-dashed border-primary p-4 my-4 rounded-lg bg-base-100 text-left"
 			>
 				<p>"{orderText}"</p>
 			</div>
-			<button class="generate mt-5" on:click={() => (ordered = true)}>
-				<span class="text-2xl">✅</span>I've ordered my sandwich<span
-					class="text-2xl">✅</span
-				>
-			</button>
+			{#if !alreadyInDB}
+				<button class="generate mt-5" on:click={() => (ordered = true)}>
+					<span class="text-2xl">✅</span>I've ordered my sandwich<span
+						class="text-2xl">✅</span
+					>
+				</button>
+			{:else}
+				<div class="text-left p-3 rounded-lg border border-gray-300">
+					{#if data.user?.id === sandwich.userId}
+						<p class="text-gray-500">Your review:</p>
+					{:else}
+						<p class="text-gray-500">{sandwich.username}'s review:</p>
+					{/if}
+					<StarRating rate={sandwich.starRating.toString()} {alreadyInDB} />
+					<p>{sandwich.comments ? sandwich.comments : "No comments"}</p>
+					<div class="mt-4">
+						<img
+							src={sandwich.imageUrl}
+							alt="Preview"
+							class="w-full max-w-sm rounded-lg shadow-md"
+						/>
+					</div>
+				</div>
+			{/if}
 		{:else}
 			<div>
 				<p class="mt-5 text-green-500 font-bold">Enjoy your sandwich! 🎉</p>
@@ -131,7 +157,11 @@ Thank you!`;
 					{#if photoUrl}
 						<p class="mt-2 text-gray-500">Photo uploaded successfully!</p>
 					{/if}
-					<button class="generate mt-5 m-auto block mb-3" on:click={submitRating} disabled={!rating || !photoUrl}>
+					<button
+						class="generate mt-5 m-auto block mb-3"
+						on:click={submitRating}
+						disabled={!rating || !photoUrl}
+					>
 						Submit rating
 					</button>
 				</div>

@@ -17,7 +17,7 @@
     <div class="prose">
         <h1 class="">Log In</h1>
         <p>
-            Use email <code>a@b.com</code> and password <code>asdfasdf</code> to login.
+            You're almost ready to dive into the world of random sandwiches! Please log in to continue.
         </p>
     </div>
     <form

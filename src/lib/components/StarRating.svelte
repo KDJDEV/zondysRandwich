@@ -1,9 +1,13 @@
 <script>
-	export let rate = '';
+	export let rate = "";
+	export let alreadyInDB;
+	export let small;
 </script>
 
-<label class="block text-gray-700 font-semibold">1. Star Rating</label>
-<form class="rating">
+{#if !alreadyInDB}
+	<label class="block text-gray-700 font-semibold">1. Star Rating</label>
+{/if}
+<form class="rating {alreadyInDB ? 'disabled' : ''} {small ? 'small' : ''}">
 	<label>
 		<input type="radio" name="stars" bind:group={rate} value="1" />
 		<span class="icon">★</span>
@@ -14,15 +18,21 @@
 	</label>
 	<label>
 		<input type="radio" name="stars" bind:group={rate} value="3" />
-		<span class="icon">★</span><span class="icon">★</span><span class="icon">★</span>
+		<span class="icon">★</span><span class="icon">★</span><span class="icon"
+			>★</span
+		>
 	</label>
 	<label>
 		<input type="radio" name="stars" bind:group={rate} value="4" />
-		<span class="icon">★</span><span class="icon">★</span><span class="icon">★</span><span class="icon">★</span>
+		<span class="icon">★</span><span class="icon">★</span><span class="icon"
+			>★</span
+		><span class="icon">★</span>
 	</label>
 	<label>
 		<input type="radio" name="stars" bind:group={rate} value="5" />
-		<span class="icon">★</span><span class="icon">★</span><span class="icon">★</span><span class="icon">★</span><span class="icon">★</span>
+		<span class="icon">★</span><span class="icon">★</span><span class="icon"
+			>★</span
+		><span class="icon">★</span><span class="icon">★</span>
 	</label>
 </form>
 
@@ -34,7 +44,12 @@
 		line-height: 50px;
 		font-size: 50px;
 	}
-
+	.small {
+		font-size: 25px;
+	}
+	.rating.disabled {
+		pointer-events: none;
+	}
 	.rating label {
 		position: absolute;
 		top: 0;

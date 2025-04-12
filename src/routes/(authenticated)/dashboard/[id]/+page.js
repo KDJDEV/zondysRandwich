@@ -9,6 +9,11 @@ export async function load({ params, fetch }) {
 
 	const sandwich = await res.json();
 
+	if (sandwich.error) {
+		return {
+			sandwich: null
+		};
+	}
 	return {
 		sandwich
 	};

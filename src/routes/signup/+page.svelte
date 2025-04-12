@@ -49,7 +49,7 @@
                 name="username"
                 placeholder="Username..."
                 class="input input-bordered w-full"
-                value="defaultUser123"
+                value={form?.username || ''}
                 required
             />
         </p>        
@@ -60,7 +60,7 @@
                 placeholder="Email..."
                 class="input input-bordered w-full"
                 required
-                value={form?.email ?? "kyle@gmail.com"}
+                value={form?.email || ''}
             />
         </p>
         <p>
@@ -68,7 +68,7 @@
                 type="password"
                 name="password"
                 placeholder="Password..."
-                value="123rqewgrgqwfegfdng"
+                value={form?.password || ''}
                 class="input input-bordered w-full"
                 required
             />
@@ -78,7 +78,7 @@
                 type="password"
                 name="password-confirm"
                 placeholder="Confirm password..."
-                value="123rqewgrgqwfegfdng"
+                value={form?.passwordConfirm || ''}
                 class="input input-bordered w-full"
                 required
             />
