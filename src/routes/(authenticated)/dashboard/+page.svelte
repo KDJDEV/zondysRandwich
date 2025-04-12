@@ -1,5 +1,5 @@
 <script>
-    import { goto } from '$app/navigation';
+	import { goto } from "$app/navigation";
 	export let data;
 
 	let loading = false;
@@ -7,7 +7,7 @@
 	let error = null;
 
 	async function generateSandwich() {
-        if (loading) return;
+		if (loading) return;
 		loading = true;
 		error = null;
 		result = null;
@@ -23,7 +23,7 @@
 			}
 
 			result = await res.json();
-            goto(`/dashboard/${result.id}?created=true`);
+			goto(`/dashboard/${result.id}?created=true`);
 		} catch (err) {
 			error = err.message;
 		} finally {
@@ -36,8 +36,10 @@
 	<h1>Dashboard</h1>
 	<p>
 		🎉 Hello there <strong>{data.user?.username}</strong>, you're logged in!
-		Ready for a sandwich?
 	</p>
+    <p>
+        Ready to keep life interesting with a random sandwich? Click the button below to generate one! There is only one simple rule: once you generate a sandwich, you must order it! 😉
+    </p>
 	<div class="text-center">
 		<button class="generate" on:click={generateSandwich} disabled={loading}>
 			{#if loading}
