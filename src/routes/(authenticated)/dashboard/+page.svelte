@@ -1,6 +1,8 @@
 <script>
 	import { goto } from "$app/navigation";
+	import { page } from "$app/stores";
 	export let data;
+	$: success = $page.url.searchParams.get("success") === "true";
 
 	let loading = false;
 	let result = null;
@@ -33,13 +35,21 @@
 </script>
 
 <section class="prose">
+	{#if success}
+		<p class="text-center text-green-500 font-bold text-xl mt-4">
+			Successfully rated your sandwich! 🎉
+		</p>
+	{/if}
+
 	<h1>Dashboard</h1>
 	<p>
 		🎉 Hello there <strong>{data.user?.username}</strong>, you're logged in!
 	</p>
-    <p>
-        Ready to keep life interesting with a random sandwich? Click the button below to generate one! There is only one simple rule: once you generate a sandwich, you must order it! 😉
-    </p>
+	<p>
+		Ready to keep life interesting with a random sandwich? Click the button
+		below to generate one! There is only one simple rule: once you generate a
+		sandwich, you must order it! 😉
+	</p>
 	<div class="text-center">
 		<button class="generate" on:click={generateSandwich} disabled={loading}>
 			{#if loading}

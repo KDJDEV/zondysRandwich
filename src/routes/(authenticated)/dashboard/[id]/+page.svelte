@@ -4,6 +4,7 @@
 	// @ts-ignore
 	import StarRating from "$lib/components/StarRating.svelte";
 	import PhotoUpload from "$lib/components/PhotoUpload.svelte";
+	import { goto } from "$app/navigation";
 
 	$: created = $page.url.searchParams.get("created") === "true";
 
@@ -28,14 +29,47 @@ Thank you!`;
 
 	function handlePhotoUpload(url) {
 		photoUrl = url;
-		console.log("Photo URL:", photoUrl);
+	}
+
+	async function submitRating() {
+	  if (!rating || !photoUrl) {
+		return; // Optionally, show a message that rating and photo are required
+	  }
+  
+	  try {
+		const response = await fetch(`/api/rate`, {
+		  method: "PATCH",
+		  headers: {
+			"Content-Type": "application/json",
+		  },
+		  body: JSON.stringify({
+			id: sandwich.id,
+			comments,
+			starRating: parseInt(rating),
+			imageUrl: photoUrl,
+		  }),
+		});
+  
+		const result = await response.json();
+  
+		if (result.success) {
+		  goto("/dashboard?success=true");
+		} else {
+		  console.error("Failed to submit rating", result.error);
+		}
+	  } catch (error) {
+		console.error("Error submitting rating", error);
+	  }
 	}
 </script>
 
 {#if sandwich}
 	{#if created}
-		<div class="w-screen h-screen absolute top-0 left-0 overflow-hidden pointer-events-none">
-			<div class="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+		<div
+			class="w-screen h-screen absolute top-0 left-0 overflow-hidden pointer-events-none"
+		>
+			<div
+				class="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2"
 				use:confetti
 			/>
 		</div>
@@ -97,6 +131,9 @@ Thank you!`;
 					{#if photoUrl}
 						<p class="mt-2 text-gray-500">Photo uploaded successfully!</p>
 					{/if}
+					<button class="generate mt-5 m-auto block mb-3" on:click={submitRating} disabled={!rating || !photoUrl}>
+						Submit rating
+					</button>
 				</div>
 			</div>
 		{/if}

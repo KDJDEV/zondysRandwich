@@ -51,10 +51,12 @@
     "@neoconfetti/svelte": "^2.2.2",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
+    "@supabase/supabase-js": "^2.49.4",
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.41.0",
     "openai": "^4.93.0",
-    "postgres": "^3.4.5"
+    "postgres": "^3.4.5",
+    "sharp": "^0.34.1"
   }
 }
