@@ -64,7 +64,7 @@
 			{#if loading}
 				Generating...
 			{:else}
-				<span class="text-2xl">🥪</span>Generate Sandwich<span class="text-2xl"
+				<span class="text-2xl">🥪</span>Generate Randwich<span class="text-2xl"
 					>🥪</span
 				>
 			{/if}
