@@ -1,6 +1,7 @@
 <script>
 	import { goto } from "$app/navigation";
 	import { page } from "$app/stores";
+	import Leaderboard from "$lib/components/Leaderboard.svelte";
 	export let data;
 	$: success = $page.url.searchParams.get("success") === "true";
 
@@ -50,7 +51,6 @@
 			View My Sandwich History
 		</a>
 	</h1>
-	
 	<p>
 		🎉 Hello there <strong>{data.user?.username}</strong>, you're logged in!
 	</p>
@@ -73,4 +73,5 @@
 			<img class="w-96 m-auto" src="/sandwich.gif" alt="A delicious sandwich" />
 		{/if}
 	</div>
+	<Leaderboard/>
 </section>

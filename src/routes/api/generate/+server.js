@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import 'dotenv/config'
 import { db } from "$lib/db";
 import { sandwiches } from "$lib/db/schema";
+import { getTodayTheme } from '$lib/theme';
 
 function getRandomSandwich(data) {
     const randomItem = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -23,8 +24,9 @@ const openai = new OpenAI({
 });
 
 async function generateSandwichName(sandwich) {
+    const theme = getTodayTheme();
     const prompt = `
-Given the sandwich ingredients below, respond with only a creative and unique name for the sandwich. Output only the name and nothing else.
+Given the sandwich ingredients below, respond with only a creative and unique name for the sandwich inspired by ${theme}. Output only the name and nothing else.
 
 Bread: ${sandwich.bread}
 Protein: ${sandwich.protein}
@@ -35,7 +37,7 @@ Toppings: ${sandwich.toppings.join(", ")}
     const response = await openai.chat.completions.create({
         model: "gpt-4o-mini-2024-07-18",
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.8,
+        temperature: 1,
         max_tokens: 20,
     });
 

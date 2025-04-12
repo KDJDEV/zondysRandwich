@@ -3,7 +3,7 @@
 	<p>
 		<label class="flex items-center gap-4">
 			<input type="checkbox" class="toggle" checked />
-			Enable thrusters 🚀
+			This currently does nothing 😅
 		</label>
 	</p>
 </section>

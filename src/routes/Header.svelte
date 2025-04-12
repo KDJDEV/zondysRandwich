@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { session } from "$lib/stores/session";
+	import { onMount } from "svelte";
+	import { theme } from '$lib/stores/theme'; 
 	import {
 		faBars,
 		faChartLine,
@@ -8,7 +10,7 @@
 		faRocket,
 		faSignIn,
 		faSignOut,
-		faBook
+		faBook,
 	} from "@fortawesome/free-solid-svg-icons";
 	import Fa from "svelte-fa";
 	import "../app.postcss";
@@ -44,14 +46,22 @@
 					label: "Sign Up",
 				},
 		  ];
+
+	onMount(async () => {
+		const res = await fetch("/api/theme");
+		if (res.ok) {
+			const data = await res.json();
+			theme.set(data.theme);
+		}
+	});
 </script>
 
-<header class=" bg-primary px-6 text-base-100">
-	<div class="max-w-screen-md mx-auto flex items-center py-2">
+<header class="bg-primary px-6 text-base-100 relative">
+	<div class="max-w-screen-md mx-auto flex items-center pt-2 sm:pb-2">
 		<h1>
 			<a href="/" class="btn btn-ghost gap-3">
-				<img src="/favicon.png" class="w-10 h-10"/>
-				Zondy's Randomizer
+				<img src="/favicon.png" class="w-10 h-10" />
+				Zondy's Randwich
 			</a>
 		</h1>
 
@@ -62,7 +72,7 @@
 			</label>
 			<ul
 				tabindex="0"
-				class="dropdown-content menu p-2 shadow-md bg-primary rounded-box w-52 "
+				class="dropdown-content menu p-2 shadow-md bg-primary rounded-box w-52"
 			>
 				{#each menu_items as item}
 					<li>
@@ -78,4 +88,12 @@
 			</ul>
 		</nav>
 	</div>
+
+	{#if theme}
+		<div class="sm:absolute max-w-screen-md mx-auto text-center pb-3 sm:-translate-y-10 sm:left-1/2 sm:-translate-x-1/2">
+			<p class="text-sm italic text-base-200">
+				Today's Theme: <span class="font-semibold text-secondary">{$theme}</span>
+			</p>
+		</div>
+	{/if}
 </header>

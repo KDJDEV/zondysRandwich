@@ -20,7 +20,7 @@
 </script>
 
 <svelte:head>
-	<title>{title}Zondy's Randomizer</title>
+	<title>{title}Zondy's Randwich</title>
 </svelte:head>
 
 <Header />

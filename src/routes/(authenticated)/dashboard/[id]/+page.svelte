@@ -120,8 +120,8 @@ Thank you!`;
 			</div>
 			{#if !alreadyInDB}
 				<button class="generate mt-5" on:click={() => (ordered = true)}>
-					<span class="text-2xl">✅</span>I've ordered my sandwich<span
-						class="text-2xl">✅</span
+					<span class="text-2xl"></span>I've ordered my sandwich<span
+						class="text-2xl"></span
 					>
 				</button>
 			{:else}
