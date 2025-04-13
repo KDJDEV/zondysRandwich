@@ -1,0 +1,7 @@
+{
+    "functions": {
+      "src/routes/api/upload/+server.ts": {
+        "runtime": "nodejs18.x"
+      }
+    }
+  }
