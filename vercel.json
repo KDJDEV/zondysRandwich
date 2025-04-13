@@ -1,7 +1,0 @@
-{
-    "functions": {
-      "src/routes/**/+server.js": {
-        "runtime": "nodejs"
-      }
-    }
-  }
