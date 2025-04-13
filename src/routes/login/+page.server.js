@@ -3,6 +3,10 @@ import { AUTH_TOKEN_EXPIRY_SECONDS } from "$lib/constants.server";
 import { invalid, redirect } from "@sveltejs/kit";
 import debug from "debug";
 
+export const config = {
+    runtime: 'nodejs' // Force Node.js runtime
+};
+
 const log = debug("app:routes:login:page.server");
 
 export const actions = {
