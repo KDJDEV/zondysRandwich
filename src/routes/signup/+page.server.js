@@ -1,6 +1,6 @@
 import { auth } from "$lib/auth";
 import { AUTH_TOKEN_EXPIRY_SECONDS } from "$lib/constants.server";
-import { invalid, redirect } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 
 export const actions = {
     async default(event) {
@@ -13,28 +13,28 @@ export const actions = {
         console.log("Form data:", { email, password, passwordConfirm });
         
         if (!username)
-            return invalid(422, { username, error: "A username is required." });
+            return fail(422, { username, error: "A username is required." });
         if (!email)
-            return invalid(422, { email, error: "An email address is required." });
+            return fail(422, { email, error: "An email address is required." });
         if (!password)
-            return invalid(422, { email, error: "A password is required." });
+            return fail(422, { email, error: "A password is required." });
         if (password.length < 8)
-            return invalid(422, {
+            return fail(422, {
                 email,
                 error: "Password must be at least 8 characters long.",
             });
         if (password.length > 32)
-            return invalid(422, {
+            return fail(422, {
                 email,
                 error: "Password cannot be more than 32 characters long.",
             });
         if (username.length > 32)
-            return invalid(422, {
+            return fail(422, {
                 email,
                 error: "Username cannot be more than 32 characters long.",
             });
         if (password !== passwordConfirm)
-            return invalid(422, {
+            return fail(422, {
                 email,
                 error: "Your passwords must match.",
             });
@@ -52,7 +52,7 @@ export const actions = {
                 String(signup_resp.error) ??
                 "There was an issue creating your account. Please try again."
             ).trim();
-            return invalid(500, { email, error });
+            return fail(500, { email, error });
         }
 
         // Sign the user in immediately
@@ -66,7 +66,7 @@ export const actions = {
             const error = (
                 String(login_resp.error) ?? "Could not sign you in. Please try again."
             ).trim();
-            return invalid(500, { email, error });
+            return fail(500, { email, error });
         }
 
         

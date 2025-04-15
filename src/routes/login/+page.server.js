@@ -1,6 +1,6 @@
 import { auth } from "$lib/auth";
 import { AUTH_TOKEN_EXPIRY_SECONDS } from "$lib/constants.server";
-import { invalid, redirect } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 import debug from "debug";
 
 export const config = {
@@ -26,7 +26,7 @@ export const actions = {
                 String(resp.error) ??
                 "No account with that email or username could be found."
             ).trim();
-            return invalid(401, { email, error });
+            return fail(401, { email, error });
         }
 
         const user = resp.value;
