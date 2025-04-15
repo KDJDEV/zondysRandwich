@@ -25,6 +25,7 @@ export const sandwiches = pgTable('sandwiches', {
 	protein: text('protein'),
 	cheese: text('cheese'),
 	toppings: text('toppings').array(),
+	sauce: text('sauce'),
 	userId: integer('user_id').notNull().references(() => users.id),
 	comments: text('comments'),
 	starRating: integer('star_rating'),

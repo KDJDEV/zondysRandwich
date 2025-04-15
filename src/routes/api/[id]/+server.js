@@ -25,6 +25,7 @@ export const GET = async ({ params, locals }) => {
 			protein: sandwiches.protein,
 			cheese: sandwiches.cheese,
 			toppings: sandwiches.toppings,
+			sauce: sandwiches.sauce,
 			userId: sandwiches.userId,
 			username: users.username,
 			imageUrl: sandwiches.imageUrl,

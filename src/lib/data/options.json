@@ -31,5 +31,14 @@
         "Oregano",
         "Salt",
         "Pepper"
+    ],
+    "sauce_options": [
+        "Boom boom sauce",
+        "Mayonnaise",
+        "Pesto mayonnaise",
+        "Housemade ranch",
+        "Whole gain mustard",
+        "Oil & vinegar",
+        "Southwest sauce"
     ]
 }

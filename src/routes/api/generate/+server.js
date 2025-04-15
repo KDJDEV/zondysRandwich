@@ -15,7 +15,8 @@ function getRandomSandwich(data) {
         bread: randomItem(data.bread_options),
         protein: randomItem(data.protein_options),
         cheese: randomItem(data.cheese_options),
-        toppings: getRandomToppings(data.topping_options)
+        toppings: getRandomToppings(data.topping_options),
+        sauce: randomItem(data.sauce_options)
     };
 }
 
@@ -31,6 +32,7 @@ Given the sandwich ingredients below, respond with only a creative and unique na
 Bread: ${sandwich.bread}
 Protein: ${sandwich.protein}
 Cheese: ${sandwich.cheese}
+Sauce: ${sandwich.sauce}
 Toppings: ${sandwich.toppings.join(", ")}
 `;
 
@@ -61,6 +63,7 @@ export const POST = async (event) => {
         protein: sandwich.protein,
         cheese: sandwich.cheese,
         toppings: sandwich.toppings,
+        sauce: sandwich.sauce,
         userId: user.id,
     }).returning({ insertedId: sandwiches.id, createdAt:sandwiches.createdAt });
     

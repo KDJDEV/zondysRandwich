@@ -14,14 +14,14 @@
 
 	const { sandwich } = data;
 	$: toppingsText = sandwich?.toppings?.length
-		? sandwich?.toppings.slice(0, -1).join(", ") +
+		? sandwich.sauce + ", " + sandwich?.toppings.slice(0, -1).join(", ") +
 		  (sandwich?.toppings.length > 1 ? ", and " : "") +
 		  sandwich?.toppings.slice(-1)
-		: "no toppings";
+		: "and no toppings";
 
-	$: orderText = `I would like ${sandwich?.cheese} and ${sandwich?.protein} on ${sandwich?.bread}.\n
-For toppings I would like ${toppingsText}.\n
-Thank you!`;
+	$: orderText = `"I would like ${sandwich?.cheese} and ${sandwich?.protein} on ${sandwich?.bread}.""<br/><br/>
+"I would like ${toppingsText}."<br/><br/>
+"Thank you!"`;
 
 	let ordered = false;
 	let rating = "";
@@ -105,6 +105,7 @@ Thank you!`;
 			<strong>🥗 Toppings (×{sandwich.toppings.length}):</strong>
 			{toppingsText}
 		</p>
+		<p><strong>🍅 Sauce:</strong> {sandwich.sauce}</p>
 		<hr class="mt-3" />
 		{#if !ordered}
 			<p class="mt-3 font-bold">
@@ -116,7 +117,7 @@ Thank you!`;
 			<div
 				class="border-2 border-dashed border-primary p-4 my-4 rounded-lg bg-base-100 text-left"
 			>
-				<p>"{orderText}"</p>
+				<p>{@html orderText}</p>
 			</div>
 			{#if !alreadyInDB}
 				<button class="generate mt-5" on:click={() => (ordered = true)}>
