@@ -1,12 +1,16 @@
 import 'dotenv/config';
 
-import { handler } from './build/handler.js';
 import express from 'express';
-import helmet from "helmet";
+import helmet from 'helmet';
 import http from 'http';
 import { createTerminus } from '@godaddy/terminus';
+import { handler } from './build/handler.js';
+import bodyParser from 'body-parser';
 
 const app = express();
+
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 app.use(
   helmet({
@@ -14,7 +18,7 @@ app.use(
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
         "script-src": ["'self'", "'unsafe-inline'"],
-        "img-src": ["'self'", "https://cqthaatacrjtizijviwf.supabase.co"] // Add your external image source here
+        "img-src": ["'self'", "https://cqthaatacrjtizijviwf.supabase.co"]
       }
     },
     referrerPolicy: {
@@ -30,8 +34,7 @@ const server = http.createServer(app);
 createTerminus(server, {
   signals: ['SIGTERM', 'SIGINT'],
   onSignal: async () => {
-    // Call your cleanup functions below. For example:
-    // db.shutdown()
+    // Optional cleanup
   }
 });
 
