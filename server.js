@@ -9,6 +9,7 @@ import bodyParser from 'body-parser';
 
 const app = express();
 
+// ADD THIS — set limits to something sane for your use case
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
@@ -18,7 +19,7 @@ app.use(
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
         "script-src": ["'self'", "'unsafe-inline'"],
-        "img-src": ["'self'", "https://cqthaatacrjtizijviwf.supabase.co"]
+        "img-src": ["'self'", "https://cqthaatacrjtizijviwf.supabase.co", "data:"]
       }
     },
     referrerPolicy: {
