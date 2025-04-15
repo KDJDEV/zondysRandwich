@@ -92,7 +92,7 @@
 	{#if theme}
 		<div class="sm:absolute max-w-screen-md mx-auto text-center pb-3 sm:-translate-y-10 sm:left-1/2 sm:-translate-x-1/2">
 			<p class="text-sm italic text-base-200">
-				Today's Theme: <span class="font-semibold text-secondary">{$theme}</span>
+				Today's Theme: <span class="font-semibold text-secondary">{$theme ? $theme : ""}</span>
 			</p>
 		</div>
 	{/if}
