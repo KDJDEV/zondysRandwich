@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@fortawesome/free-solid-svg-icons": "6.2.0",
+    "@sveltejs/adapter-node": "^1.0.0-next.88",
     "@sveltejs/kit": "1.0.0-next.484",
     "@tailwindcss/typography": "0.5.7",
     "@types/debug": "4.1.7",
@@ -47,14 +48,16 @@
   },
   "type": "module",
   "dependencies": {
+    "@godaddy/terminus": "^4.12.1",
     "@neoconfetti/svelte": "^2.2.2",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
     "@supabase/supabase-js": "^2.49.4",
-    "@sveltejs/adapter-node": "^1.0.0-next.88",
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.41.0",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
     "openai": "^4.93.0",
     "postgres": "^3.4.5",
     "sharp": "^0.34.1"
