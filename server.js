@@ -4,15 +4,11 @@ import express from 'express';
 import helmet from 'helmet';
 import http from 'http';
 import { createTerminus } from '@godaddy/terminus';
-import { handler } from './build/handler.js';
-import bodyParser from 'body-parser';
+import { handler } from './build/handler.js'; // SvelteKit handler
 
 const app = express();
 
-// ADD THIS — set limits to something sane for your use case
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
-
+// Removed body-parser middleware. SvelteKit handles body parsing automatically.
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -28,17 +24,20 @@ app.use(
   })
 );
 
+// Use the SvelteKit handler to process requests
 app.use(handler);
 
 const server = http.createServer(app);
 
+// Gracefully shut down the server using terminus
 createTerminus(server, {
   signals: ['SIGTERM', 'SIGINT'],
   onSignal: async () => {
-    // Optional cleanup
+    // Optional cleanup (if any)
   }
 });
 
+// Start the server on port 3000
 server.listen(3000, () => {
   console.log('Listening on port 3000');
 });
