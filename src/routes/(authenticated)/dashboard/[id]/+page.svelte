@@ -14,13 +14,17 @@
 
 	const { sandwich } = data;
 	$: toppingsText = sandwich?.toppings?.length
-		? sandwich.sauce + ", " + sandwich?.toppings.slice(0, -1).join(", ") +
+		? sandwich?.toppings.slice(0, -1).join(", ") +
 		  (sandwich?.toppings.length > 1 ? ", and " : "") +
 		  sandwich?.toppings.slice(-1)
-		: "and no toppings";
-
-	$: orderText = `"I would like ${sandwich?.cheese} and ${sandwich?.protein} on ${sandwich?.bread}.""<br/><br/>
-"I would like ${toppingsText}."<br/><br/>
+		: "no toppings";
+	$: toppingsText2 = sandwich.sauce + ", " + (sandwich?.toppings?.length
+		? sandwich?.toppings.slice(0, -1).join(", ") +
+		  (sandwich?.toppings.length > 1 ? ", and " : "") +
+		  sandwich?.toppings.slice(-1)
+		: "and no toppings");
+	$: orderText = `"I would like ${sandwich?.bread} with ${sandwich?.cheese} and ${sandwich?.protein}."<br/><br/>
+"I would like ${toppingsText2}."<br/><br/>
 "Thank you!"`;
 
 	let ordered = false;

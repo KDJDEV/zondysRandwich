@@ -9,7 +9,7 @@ import { getTodayTheme } from '$lib/theme';
 function getRandomSandwich(data) {
     const randomItem = arr => arr[Math.floor(Math.random() * arr.length)];
     const getRandomToppings = toppings =>
-        toppings.filter(() => Math.random() < 0.5); // 50% chance per topping
+        toppings.filter(() => Math.random() < 0.4); // 40% chance per topping
 
     return {
         bread: randomItem(data.bread_options),
@@ -39,7 +39,7 @@ Toppings: ${sandwich.toppings.join(", ")}
     const response = await openai.chat.completions.create({
         model: "gpt-4o-mini-2024-07-18",
         messages: [{ role: "user", content: prompt }],
-        temperature: 1,
+        temperature: 0.8,
         max_tokens: 20,
     });
 
