@@ -4,9 +4,6 @@
 	export let small;
 </script>
 
-{#if !alreadyInDB}
-	<label class="block text-gray-700 font-semibold">1. Star Rating</label>
-{/if}
 <form class="rating {alreadyInDB ? 'disabled' : ''} {small ? 'small' : ''}">
 	<label>
 		<input type="radio" name="stars" bind:group={rate} value="1" />

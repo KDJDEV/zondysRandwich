@@ -5,11 +5,12 @@ import 'dotenv/config'
 import { db } from "$lib/db";
 import { sandwiches } from "$lib/db/schema";
 import { getTodayTheme } from '$lib/theme';
+import { count, gt, eq } from "drizzle-orm";
 
 function getRandomSandwich(data) {
     const randomItem = arr => arr[Math.floor(Math.random() * arr.length)];
     const getRandomToppings = toppings =>
-        toppings.filter(() => Math.random() < 0.4); // 40% chance per topping
+        toppings.filter(() => Math.random() < 0.3); // 30% chance per topping
 
     return {
         bread: randomItem(data.bread_options),
@@ -27,7 +28,7 @@ const openai = new OpenAI({
 async function generateSandwichName(sandwich) {
     const theme = getTodayTheme();
     const prompt = `
-Given the sandwich ingredients below, respond with only a creative and unique name for the sandwich inspired by ${theme}. Output only the name and nothing else.
+You are a brilliant and slightly eccentric chef who names sandwiches like an artist titles paintings. Given the following sandwich ingredients and the theme "${theme}", come up with a **bold, clever, and one-of-a-kind name** for this sandwich — something that sparks curiosity or laughter, like a band name or a poetic pun. Don't include anything but the name itself.
 
 Bread: ${sandwich.bread}
 Protein: ${sandwich.protein}
@@ -48,16 +49,30 @@ Toppings: ${sandwich.toppings.join(", ")}
 }
 
 export const POST = async (event) => {
-	const user = event.locals?.user;
+    const user = event.locals?.user;
 
-	if (!user) {
-		return json({ error: 'not authorized' }, { status: 401 });
-	}
+    if (!user) {
+        return json({ error: "User must be logged in to create sandwiches." }, { status: 401 });
+    } else {
+        const hoursAgo = new Date(Date.now() - 18 * 60 * 60 * 1000);
 
-	let sandwich = getRandomSandwich(optionsData);
-	let name = await generateSandwichName(sandwich);
+            const countResult = await db
+                .select({ total: count() })
+                .from(sandwiches)
+                .where(eq(sandwiches.userId, user.id))
+                .where(gt(sandwiches.createdAt, hoursAgo));
+            
+            const userSandwichCount = Number(countResult[0]?.total ?? 0);
 
-	const result = await db.insert(sandwiches).values({
+            if (userSandwichCount >= 2) {
+                return json({ error: "Sandwich limit reached: 2 per 24 hours." }, { status: 429 });
+            }
+    }
+
+    const sandwich = getRandomSandwich(optionsData);
+    const name = await generateSandwichName(sandwich);
+
+    const result = await db.insert(sandwiches).values({
         bread: sandwich.bread,
         name: name,
         protein: sandwich.protein,
@@ -65,14 +80,15 @@ export const POST = async (event) => {
         toppings: sandwich.toppings,
         sauce: sandwich.sauce,
         userId: user.id,
-    }).returning({ insertedId: sandwiches.id, createdAt:sandwiches.createdAt });
-    
+    }).returning({ insertedId: sandwiches.id, createdAt: sandwiches.createdAt });
+
     const insertedId = result[0]?.insertedId;
     const createdAt = result[0]?.createdAt;
-	return json({
-		...sandwich,
-		name,
-		id: insertedId,
-        createdAt:createdAt
-	});
+
+    return json({
+        ...sandwich,
+        name,
+        id: insertedId,
+        createdAt,
+    });
 };

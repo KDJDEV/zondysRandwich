@@ -18,12 +18,15 @@
 		  (sandwich?.toppings.length > 1 ? ", and " : "") +
 		  sandwich?.toppings.slice(-1)
 		: "no toppings";
-	$: toppingsText2 = sandwich.sauce + ", " + (sandwich?.toppings?.length
-		? sandwich?.toppings.slice(0, -1).join(", ") +
-		  (sandwich?.toppings.length > 1 ? ", and " : "") +
-		  sandwich?.toppings.slice(-1)
-		: "and no toppings");
-	$: orderText = `"I would like ${sandwich?.bread} with ${sandwich?.cheese} and ${sandwich?.protein}."<br/><br/>
+	$: toppingsText2 =
+		(sandwich?.toppings?.length
+			? sandwich.toppings.slice(0, -1).join(", ") +
+			  (sandwich.toppings.length > 1 ? ", and " : "") +
+			  sandwich.toppings.slice(-1)
+			: "no toppings") +
+		", with " +
+		sandwich.sauce;
+	$: orderText = `"I would like ${sandwich?.protein} and ${sandwich?.cheese} on ${sandwich?.bread}."<br/><br/>
 "I would like ${toppingsText2}."<br/><br/>
 "Thank you!"`;
 
@@ -99,7 +102,22 @@
 		{/if}
 	{/if}
 	<div class=" text-center">
-		<p class="text-gray-500 text-sm">Sandwich #{sandwich.id} ({new Date(sandwich.createdAt).toLocaleDateString()})</p>
+		{#if !sandwich.userId}
+			<p class="text-red-600 mb-5">
+				(This randwich wasn't linked to a user account and can't be given a review or
+				added to the leaderboard. If you created this sandwich and would like
+				your future randwiches to count, consider <a
+					href="/signup"
+					class="link text-black">creating an account</a
+				>
+				before generating your next one.)<br />
+			</p>
+		{/if}
+		<p class="text-gray-500 text-sm">
+			Sandwich #{sandwich.id} ({new Date(
+				sandwich.createdAt
+			).toLocaleDateString()})
+		</p>
 		<h1 class=" text-2xl font-bold">🔥 {sandwich.name} 🔥</h1>
 
 		<p><strong>🥖 Bread:</strong> {sandwich.bread}</p>
@@ -123,75 +141,108 @@
 			>
 				<p>{@html orderText}</p>
 			</div>
-			{#if !alreadyInDB}
-				<button class="generate mt-5" on:click={() => (ordered = true)}>
-					<span class="text-2xl"></span>I've ordered my sandwich<span
-						class="text-2xl"></span
-					>
-				</button>
-			{:else}
-				<div class="text-left p-3 rounded-lg border border-gray-300">
-					{#if data.user?.id === sandwich.userId}
-						<p class="text-gray-500">Your review:</p>
-					{:else}
-						<p class="text-gray-500">{sandwich.username}'s review:</p>
-					{/if}
-					<StarRating rate={sandwich.starRating.toString()} {alreadyInDB} />
-					<p>{sandwich.comments ? sandwich.comments : "No comments"}</p>
-					<div class="mt-4">
-						<img
-							src={sandwich.imageUrl}
-							alt="Preview"
-							class="w-full max-w-sm rounded-lg shadow-md"
+			{#if sandwich.userId}
+				{#if !alreadyInDB}
+					<button class="generate mt-5" on:click={() => (ordered = true)}>
+						<span class="text-2xl" />I've ordered my sandwich<span
+							class="text-2xl"
 						/>
+					</button>
+				{:else}
+					<div class="text-left p-3 rounded-lg border border-gray-300">
+						{#if data.user?.id === sandwich.userId}
+							<p class="text-gray-500">Your review:</p>
+						{:else}
+							<p class="text-gray-500">{sandwich.username}'s review:</p>
+						{/if}
+						<StarRating rate={sandwich.starRating.toString()} {alreadyInDB} />
+						<p>{sandwich.comments ? sandwich.comments : "No comments"}</p>
+						<div class="mt-4">
+							<img
+								src={sandwich.imageUrl}
+								alt="Preview"
+								class="w-full max-w-sm rounded-lg shadow-md"
+							/>
+						</div>
+					</div>
+				{/if}
+				{/if}
+			{:else}
+				<div>
+					<p class="mt-5 text-green-500 font-bold">Enjoy your sandwich! 🎉</p>
+					<h2 class="text-xl font-bold">Three last steps</h2>
+
+					<div
+						class="border-2 border-dashed border-primary p-4 my-4 rounded-lg bg-base-100 text-left"
+					>
+						{#if !alreadyInDB}
+							<h2 class="text-lg font-semibold mt-3">
+								1. Upload a photo of your sandwich <p
+									class="text-red-600 inline"
+								>
+									(BEFORE EATING)
+								</p>
+							</h2>
+							<p class="text-gray-500 mb-3">
+								(this is used for verification purposes for the leaderboard)
+							</p>
+						{/if}
+						<PhotoUpload
+							{photoUrl}
+							onUpload={handlePhotoUpload}
+							sandwichId={sandwich.id}
+						/>
+						{#if photoUrl}
+							<p class="mt-2 text-gray-500">Photo uploaded successfully!</p>
+						{/if}
+						{#if error}
+							<div class="alert alert-error mb-2">
+								<div>
+									<Fa icon={faWarning} />
+									{error}
+								</div>
+							</div>
+						{/if}
+						{#if !alreadyInDB}
+							<label class="text-lg font-semibold mt-3 block mb-3"
+								>2. Eat your sandwich</label
+							>
+						{/if}
+						{#if !alreadyInDB}
+							<label class="text-lg font-semibold mt-3"
+								>3. Rate your sandwich</label
+							>
+						{/if}
+						<div>
+							<StarRating bind:rate={rating} />
+							{#if rating}
+								<p>{rating} Stars</p>
+							{:else}
+								<p class="text-gray-500">Please rate your sandwich</p>
+							{/if}
+							<div class="mt-4">
+								<label
+									for="comments"
+									class="block text-gray-700 font-semibold mb-2"
+									>Optional Comments</label
+								>
+								<textarea
+									id="comments"
+									placeholder="Share your thoughts here..."
+									bind:value={comments}
+									class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none min-h-[80px] transition-all"
+								/>
+							</div>
+						</div>
+						<button
+							class="generate mt-5 m-auto block mb-3"
+							on:click={submitRating}
+						>
+							Submit rating
+						</button>
 					</div>
 				</div>
 			{/if}
-		{:else}
-			<div>
-				<p class="mt-5 text-green-500 font-bold">Enjoy your sandwich! 🎉</p>
-				<h2 class="text-xl font-bold">Three last steps</h2>
-				<div
-					class="border-2 border-dashed border-primary p-4 my-4 rounded-lg bg-base-100 text-left"
-				>
-					{#if error}
-						<div class="alert alert-error mb-2">
-							<div>
-								<Fa icon={faWarning} />
-								{error}
-							</div>
-						</div>
-					{/if}
-					<StarRating bind:rate={rating} />
-					{#if rating}
-						<p>{rating} Stars</p>
-					{:else}
-						<p class="text-gray-500">Please rate your sandwich</p>
-					{/if}
-					<div class="mt-4">
-						<label for="comments" class="block text-gray-700 font-semibold mb-2"
-							>2. Optional Comments</label
-						>
-						<textarea
-							id="comments"
-							placeholder="Share your thoughts here..."
-							bind:value={comments}
-							class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none min-h-[80px] transition-all"
-						/>
-					</div>
-					<PhotoUpload {photoUrl} onUpload={handlePhotoUpload} />
-					{#if photoUrl}
-						<p class="mt-2 text-gray-500">Photo uploaded successfully!</p>
-					{/if}
-					<button
-						class="generate mt-5 m-auto block mb-3"
-						on:click={submitRating}
-					>
-						Submit rating
-					</button>
-				</div>
-			</div>
-		{/if}
 	</div>
 {:else}
 	<p>Sandwich not found.</p>

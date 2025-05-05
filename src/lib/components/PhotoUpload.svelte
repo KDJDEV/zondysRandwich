@@ -1,43 +1,54 @@
 <script>
+	import { onMount } from "svelte";
+
 	// Props for the component
 	export let photoUrl = ""; // URL of the uploaded photo (to pass back to parent)
 	export let onUpload = () => {}; // Callback function when photo is uploaded
+	export let sandwichId = ""; // Unique sandwich ID
 
 	let photo = null; // Holds the selected file
 
-	function resizeImage(file, maxSize = 1024) {
-	return new Promise((resolve) => {
-		const img = new Image();
-		const reader = new FileReader();
-		reader.onload = (e) => {
-			img.src = e.target.result;
-		};
-		img.onload = () => {
-			const canvas = document.createElement("canvas");
-			let { width, height } = img;
-
-			if (width > height) {
-				if (width > maxSize) {
-					height *= maxSize / width;
-					width = maxSize;
-				}
-			} else {
-				if (height > maxSize) {
-					width *= maxSize / height;
-					height = maxSize;
-				}
-			}
-
-			canvas.width = width;
-			canvas.height = height;
-			canvas.getContext("2d").drawImage(img, 0, 0, width, height);
-			canvas.toBlob((blob) => {
-				resolve(new File([blob], file.name, { type: blob.type }));
-			}, "image/jpeg", 0.8);
-		};
-		reader.readAsDataURL(file);
+	onMount(() => {
+		const savedUrl = localStorage.getItem(`photoUrl:${sandwichId}`);
+		if (savedUrl) {
+			photoUrl = savedUrl;
+			onUpload(photoUrl);
+		}
 	});
-}
+
+	function resizeImage(file, maxSize = 1024) {
+		return new Promise((resolve) => {
+			const img = new Image();
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				img.src = e.target.result;
+			};
+			img.onload = () => {
+				const canvas = document.createElement("canvas");
+				let { width, height } = img;
+
+				if (width > height) {
+					if (width > maxSize) {
+						height *= maxSize / width;
+						width = maxSize;
+					}
+				} else {
+					if (height > maxSize) {
+						width *= maxSize / height;
+						height = maxSize;
+					}
+				}
+
+				canvas.width = width;
+				canvas.height = height;
+				canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+				canvas.toBlob((blob) => {
+					resolve(new File([blob], file.name, { type: blob.type }));
+				}, "image/jpeg", 0.8);
+			};
+			reader.readAsDataURL(file);
+		});
+	}
 
 	// Handle file selection
 	async function handleFileChange(event) {
@@ -55,12 +66,14 @@
 			});
 
 			if (!response.ok) {
-				throw new Error("Upload failed");
+				alert("Upload failed");
+				return;
 			}
 
 			const data = await response.json();
 			if (data.imageUrl) {
 				photoUrl = data.imageUrl;
+				localStorage.setItem(`photoUrl:${sandwichId}`, photoUrl); // Save to localStorage
 				onUpload(photoUrl);
 			} else {
 				alert("Error: " + data.error);
@@ -70,9 +83,6 @@
 </script>
 
 <div class="mt-4">
-	<label for="photo" class="block text-gray-700 font-semibold mb-2"
-		>3. Upload a Photo</label
-	>
 	<input
 		type="file"
 		id="photo"
