@@ -30,13 +30,13 @@ export const cookie = {
     return ok(user);
   },
 
-  async login({ email, password, opts }) {
+  async login({ username, password, opts }) {
     if (!opts?.cookies) return err(new Error("Missing cookies"));
 
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.email, email))
+      .where(eq(users.username, username))
       .limit(1);
 
     if (!user) return err(new Error("User not found"));
@@ -53,30 +53,29 @@ export const cookie = {
     return ok(user);
   },
 
-  async signup({ email, username, password, passwordConfirm, opts }) {
+  async signup({ username, password, passwordConfirm, opts }) {
     if (!opts?.cookies) return err(new Error("Missing cookies"));
-    console.log(email, username, password, passwordConfirm)
-    if (!email || !username || !password) return err(new Error("Missing fields"));
+    console.log(username, password, passwordConfirm)
+    if (!username || !password) return err(new Error("Missing fields"));
     if (password !== passwordConfirm) return err(new Error("Passwords do not match"));
 
     const [existing] = await db
       .select()
       .from(users)
-      .where(eq(users.email, email))
+      .where(eq(users.username, username))
       .limit(1);
 
-    if (existing) return err(new Error("Email is already registered"));
+    if (existing) return err(new Error("Username is already registered"));
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const [newUser] = await db
       .insert(users)
       .values({
-        email,
         username,
         password: hashedPassword,
       })
-      .returning({ id: users.id, email: users.email, username: users.username });
+      .returning({ id: users.id, username: users.username });
 
     const token = generateSessionToken();
     const session = await createSession(token, newUser.id);

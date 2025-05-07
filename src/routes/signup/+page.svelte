@@ -55,16 +55,6 @@
         </p>        
         <p>
             <input
-                type="email"
-                name="email"
-                placeholder="Email..."
-                class="input input-bordered w-full"
-                required
-                value={form?.email || ''}
-            />
-        </p>
-        <p>
-            <input
                 type="password"
                 name="password"
                 placeholder="Password..."
@@ -89,11 +79,4 @@
             <a href="/login" class="link">Log In</a>
         </p>
     </form>
-
-    {#if form}
-        <section class="my-8">
-            <h3>Form data:</h3>
-            <pre>{JSON.stringify(form, null, 2)}</pre>
-        </section>
-    {/if}
 </section>

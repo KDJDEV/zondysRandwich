@@ -49,16 +49,14 @@
         {/if}
         <p>
             <input
-                autocomplete="email"
-                autocorrect="off"
-                type="email"
-                name="email"
-                placeholder="Email..."
+                type="text"
+                name="username"
+                placeholder="Username..."
                 class="input input-bordered w-full"
+                value={form?.username || ''}
                 required
-                value={form?.email ?? ""}
             />
-        </p>
+        </p>     
         <p>
             <input
                 autocomplete="current-password"
@@ -75,11 +73,4 @@
             <a href="/signup" class="link">Sign Up</a>
         </p>
     </form>
-
-    {#if form}
-        <section class="my-12 prose">
-            <h3>Form data:</h3>
-            <pre>{JSON.stringify(form, null, 2)}</pre>
-        </section>
-    {/if}
 </section>

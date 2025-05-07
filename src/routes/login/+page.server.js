@@ -12,11 +12,11 @@ const log = debug("app:routes:login:page.server");
 export const actions = {
     async default(event) {
         const data = await event.request.formData();
-        const email = data.get("email");
+        const username = data.get("username");
         const password = data.get("password");
 
         const resp = await auth.login({
-            email,
+            username,
             password,
             opts: { cookies: event.cookies },
         });
@@ -24,9 +24,9 @@ export const actions = {
         if (resp.isErr()) {
             const error = (
                 String(resp.error) ??
-                "No account with that email or username could be found."
+                "No account with that username could be found."
             ).trim();
-            return fail(401, { email, error });
+            return fail(401, { username, error });
         }
 
         const user = resp.value;

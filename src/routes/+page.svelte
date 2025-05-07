@@ -3,7 +3,7 @@
 	import { theme } from '$lib/stores/theme'; 
 </script>
 
-<div class="prose">
+<div class="prose flex-grow">
 	<h1>Zondy's Randwich</h1>
 	<p>
 		Can't decide what to get? Tired of ordering the same sandwich every time?

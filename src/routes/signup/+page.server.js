@@ -6,41 +6,37 @@ export const actions = {
     async default(event) {
         const data = await event.request.formData();
         const username = data.get("username");
-        const email = data.get("email");
         const password = data.get("password");
         const passwordConfirm = data.get("password-confirm");
 
-        console.log("Form data:", { email, password, passwordConfirm });
+        console.log("Form data:", { password, passwordConfirm });
         
         if (!username)
             return fail(422, { username, error: "A username is required." });
-        if (!email)
-            return fail(422, { email, error: "An email address is required." });
         if (!password)
-            return fail(422, { email, error: "A password is required." });
+            return fail(422, { username, error: "A password is required." });
         if (password.length < 8)
             return fail(422, {
-                email,
+                username,
                 error: "Password must be at least 8 characters long.",
             });
         if (password.length > 32)
             return fail(422, {
-                email,
+                username,
                 error: "Password cannot be more than 32 characters long.",
             });
         if (username.length > 32)
             return fail(422, {
-                email,
+                username,
                 error: "Username cannot be more than 32 characters long.",
             });
         if (password !== passwordConfirm)
             return fail(422, {
-                email,
+                username,
                 error: "Your passwords must match.",
             });
 
         const signup_resp = await auth.signup({
-            email,
             username,
             password,
             passwordConfirm,
@@ -52,12 +48,12 @@ export const actions = {
                 String(signup_resp.error) ??
                 "There was an issue creating your account. Please try again."
             ).trim();
-            return fail(500, { email, error });
+            return fail(500, { username, error });
         }
 
         // Sign the user in immediately
         const login_resp = await auth.login({
-            email,
+            username,
             password,
             opts: { cookies: event.cookies },
         });
@@ -66,7 +62,7 @@ export const actions = {
             const error = (
                 String(login_resp.error) ?? "Could not sign you in. Please try again."
             ).trim();
-            return fail(500, { email, error });
+            return fail(500, { username, error });
         }
 
         
