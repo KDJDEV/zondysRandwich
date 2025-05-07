@@ -1,7 +1,7 @@
 import { json } from "@sveltejs/kit";
 import { db } from "$lib/db";
 import { sandwiches } from "$lib/db/schema";
-import { count, eq, gt, desc } from "drizzle-orm";
+import { count, eq, gt, and } from "drizzle-orm";
 
 export const GET = async (event) => {
     const user = event.locals?.user;
@@ -16,8 +16,9 @@ export const GET = async (event) => {
         const countResult = await db
             .select({ total: count() })
             .from(sandwiches)
-            .where(eq(sandwiches.userId, user.id))
-            .where(gt(sandwiches.createdAt, hoursAgo));
+            .where(and(
+                eq(sandwiches.userId, user.id),
+                gt(sandwiches.createdAt, hoursAgo)));
         
         const recentCount = Number(countResult[0]?.total ?? 0);
         
@@ -41,8 +42,8 @@ export const GET = async (event) => {
 
         return json({
             recentCount,
-            limit: 2,
-            remaining: Math.max(0, 2 - recentCount)
+            limit: 3,
+            remaining: Math.max(0, 3 - recentCount)
         });
     } catch (error) {
         console.error("Error fetching sandwich count:", error);

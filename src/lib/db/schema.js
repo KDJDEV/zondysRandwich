@@ -1,4 +1,4 @@
-import { pgTable, serial, text, varchar, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, varchar, integer, timestamp, boolean } from "drizzle-orm/pg-core";
 
 export const users = pgTable('users', {
 	id: serial('id').primaryKey(),
@@ -31,4 +31,6 @@ export const sandwiches = pgTable('sandwiches', {
 	starRating: integer('star_rating'),
 	imageUrl: varchar('image_url', { length: 512 }),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
+	rerolled: boolean('rerolled').default(false).notNull(),
+	deleted: boolean('deleted').default(false).notNull(),
 });

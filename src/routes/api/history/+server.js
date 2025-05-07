@@ -1,19 +1,24 @@
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/db';
 import { sandwiches } from '$lib/db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, not, and } from 'drizzle-orm';
 
 export const GET = async (event) => {
-	const user = event.locals?.user;
+	const userId = event.url.searchParams.get('userId');
 
-	if (!user) {
-		return json({ error: 'not authorized' }, { status: 401 });
+	if (!userId) {
+		return json({ error: 'userId is required' }, { status: 400 });
 	}
 
 	const userSandwiches = await db
 		.select()
 		.from(sandwiches)
-		.where(eq(sandwiches.userId, user.id)).orderBy(desc(sandwiches.id));;
+		.where(and(
+			eq(sandwiches.userId, userId),
+			not(eq(sandwiches.rerolled, true)),
+			eq(sandwiches.deleted, false)
+		))
+		.orderBy(desc(sandwiches.id));
 
 	return json(userSandwiches);
 };

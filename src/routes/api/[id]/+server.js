@@ -2,7 +2,7 @@ import { json } from "@sveltejs/kit";
 import 'dotenv/config'
 import { db } from "$lib/db";
 import { sandwiches, users } from "$lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export const GET = async ({ params }) => {
 	const id = Number(params.id);
@@ -28,7 +28,10 @@ export const GET = async ({ params }) => {
 			createdAt: sandwiches.createdAt
 		})
 		.from(sandwiches)
-		.where(eq(sandwiches.id, id))
+		.where(and(
+			eq(sandwiches.id, id),
+			eq(sandwiches.deleted, false)
+		))
 		.leftJoin(users, eq(sandwiches.userId, users.id));
 
 	const sandwich = result[0];
@@ -38,4 +41,37 @@ export const GET = async ({ params }) => {
 	}
 
 	return json(sandwich);
+};
+
+export const DELETE = async ({ params, locals }) => {
+	const sandwichId = Number(params.id);
+	const user = locals?.user;
+
+	if (!user) {
+		return json({ error: "Unauthorized" }, { status: 401 });
+	}
+
+	if (isNaN(sandwichId)) {
+		return json({ error: "Invalid sandwich ID" }, { status: 400 });
+	}
+
+	const result = await db
+		.select({ id: sandwiches.id })
+		.from(sandwiches)
+		.where(and(
+			eq(sandwiches.id, sandwichId),
+			eq(sandwiches.userId, user.id)
+		));
+
+	if (result.length === 0) {
+		return json({ error: "Sandwich not found or not yours" }, { status: 403 });
+	}
+
+	const updated = await db
+		.update(sandwiches)
+		.set({ deleted: true })
+		.where(eq(sandwiches.id, sandwichId))
+		.returning({ id: sandwiches.id });
+
+	return json({ success: true, deletedId: updated[0].id });
 };

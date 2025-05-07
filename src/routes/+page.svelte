@@ -59,7 +59,6 @@
 		the daily theme! (today's theme is <strong>{$theme ? $theme : ""}</strong>)
 	</p>
 	<p>
-		Also check out the leaderboard to see how many randwiches you've eaten
-		compared to others!
+		Also check out the leaderboard to see who has eaten the most randwiches!
 	</p>
 </div>

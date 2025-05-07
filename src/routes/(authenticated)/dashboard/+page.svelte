@@ -5,11 +5,12 @@
 	import Leaderboard from "$lib/components/Leaderboard.svelte";
 	export let data;
 	$: success = $page.url.searchParams.get("success") === "true";
+	$: deleted = $page.url.searchParams.get("deleted") === "true";
 
 	let loading = false;
 	let result = null;
 	let error = null;
-	let sandwichesRemaining = 2;
+	let sandwichesRemaining = 3;
 	async function checkSandwichLimit() {
 		try {
 			const res = await fetch(`/api/countToday`);
@@ -17,7 +18,7 @@
 
 			if (res.ok) {
 				sandwichesRemaining = data.remaining;
-				if (data.count >= 2) {
+				if (data.count >= 3) {
 					return false;
 				}
 				return true;
@@ -66,12 +67,17 @@
 			Successfully rated your sandwich! 🎉
 		</p>
 	{/if}
+	{#if deleted}
+		<p class="text-center text-green-500 font-bold text-xl mt-4">
+			Successfully deleted your sandwich!
+		</p>
+	{/if}
 
 	<h1 class="flex items-center gap-4 mb-0">
 		Dashboard
 		{#if data.user}
 			<a
-				href="/dashboard/history"
+				href={`/dashboard/history?userId=${data.user.id}`}
 				class="text-sm text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
 			>
 				View My Sandwich History
@@ -81,11 +87,11 @@
 	{#if data.user}
 		{#if sandwichesRemaining < 1}
 			<p class="text-sm text-red-600 font-semibold">
-				Daily randwiches remaining: {sandwichesRemaining}
+				Daily rolls remaining: {sandwichesRemaining}
 			</p>
 		{:else}
 			<p class="text-sm text-black font-semibold">
-				Daily randwiches remaining: {sandwichesRemaining}
+				Daily rolls remaining: {sandwichesRemaining}
 			</p>
 		{/if}
 	{/if}
@@ -117,7 +123,7 @@
 				{/if}
 			</button>
 		{:else}
-			<p class="text-red-600 font-bold">You're out of randwiches for today. Please come back tomorrow.</p>
+			<p class="text-red-600 font-bold">You're out of randwich rolls for today. Please come back tomorrow.</p>
 		{/if}
 		{#if loading}
 			<img class="w-96 m-auto" src="/sandwich.gif" alt="A delicious sandwich" />

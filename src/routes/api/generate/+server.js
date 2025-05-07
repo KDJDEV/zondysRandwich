@@ -5,7 +5,7 @@ import 'dotenv/config'
 import { db } from "$lib/db";
 import { sandwiches } from "$lib/db/schema";
 import { getTodayTheme } from '$lib/theme';
-import { count, gt, eq } from "drizzle-orm";
+import { count, gt, eq, and } from "drizzle-orm";
 
 function getRandomSandwich(data) {
     const randomItem = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -51,22 +51,21 @@ Toppings: ${sandwich.toppings.join(", ")}
 export const POST = async (event) => {
     const user = event.locals?.user;
 
-    if (!user) {
-        return json({ error: "User must be logged in to create sandwiches." }, { status: 401 });
-    } else {
+    if (user) {
         const hoursAgo = new Date(Date.now() - 18 * 60 * 60 * 1000);
 
-            const countResult = await db
-                .select({ total: count() })
-                .from(sandwiches)
-                .where(eq(sandwiches.userId, user.id))
-                .where(gt(sandwiches.createdAt, hoursAgo));
-            
-            const userSandwichCount = Number(countResult[0]?.total ?? 0);
+        const countResult = await db
+            .select({ total: count() })
+            .from(sandwiches)
+            .where(and(
+                eq(sandwiches.userId, user.id),
+                gt(sandwiches.createdAt, hoursAgo)));
 
-            if (userSandwichCount >= 2) {
-                return json({ error: "Sandwich limit reached: 2 per 24 hours." }, { status: 429 });
-            }
+        const userSandwichCount = Number(countResult[0]?.total ?? 0);
+
+        if (userSandwichCount >= 3) {
+            return json({ error: "Sandwich limit reached: 2 per 24 hours." }, { status: 429 });
+        }
     }
 
     const sandwich = getRandomSandwich(optionsData);
@@ -79,7 +78,7 @@ export const POST = async (event) => {
         cheese: sandwich.cheese,
         toppings: sandwich.toppings,
         sauce: sandwich.sauce,
-        userId: user.id,
+        userId: user?.id || null,
     }).returning({ insertedId: sandwiches.id, createdAt: sandwiches.createdAt });
 
     const insertedId = result[0]?.insertedId;
