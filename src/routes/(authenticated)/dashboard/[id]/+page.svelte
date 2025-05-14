@@ -219,20 +219,21 @@
 		<p><strong>🍅 Sauce:</strong> {sandwich.sauce}</p>
 		{#if data.user?.id === sandwich.userId && !alreadyInDB}
 			{#if sandwichesRemaining > 0}
-				<button
-					class="m-auto flex items-center gap-2 px-4 py-2 bg-white border-2 border-yellow-400 text-yellow-600 hover:bg-yellow-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium rounded-full transition-all duration-200 shadow-sm"
-					on:click={rerollSandwhich}
-					disabled={loading}
-				>
-					{#if loading}
-						<span class="animate-spin text-xl">🔁</span>
-						<span>Rerolling...</span>
-					{:else}
-						<span class="text-xl">🎲</span>
-						<span>Reroll Sandwich</span>
-					{/if}
-					<p class="text-black">({sandwichesRemaining} roll remaining today)</p>
-				</button>
+			<button
+			class="mt-3 m-auto flex items-center gap-2 px-6 py-3 bg-yellow-500 border-2 border-yellow-600 text-white hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium rounded-full transition-all duration-200 shadow-lg"
+			on:click={rerollSandwhich}
+			disabled={loading}
+		  >
+			{#if loading}
+			  <span class="animate-spin text-xl">🔁</span>
+			  <span>Rerolling...</span>
+			{:else}
+			  <span class="text-xl">🎲</span>
+			  <span>Reroll Sandwich</span>
+			{/if}
+			<p class="text-black">({sandwichesRemaining} {sandwichesRemaining == 1 ? "roll" : "rolls"} remaining today)</p>
+		  </button>
+		  
 			{:else}
 				<p class="text-yellow-700 text-sm mt-2">
 					You can't reroll because you've used all your rolls for today.

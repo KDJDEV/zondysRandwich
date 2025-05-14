@@ -9,13 +9,13 @@
 		Can't decide what to get? Tired of ordering the same sandwich every time?
 		Try the <strong>randwich</strong>! We believe sandwiches should be exciting.
 		Whether you're looking to mix up your usual lunch routine or just want
-		something unexpected, the randwich is for you!
+		to be surprised with something unexpected, the randwich is for you!
 	</p>
 
 	<h2 class="mt-0">How it works:</h2>
 	<ol>
-		<li>Create an account (recommended for tracking and saving your randwiches).</li>
-		<li>Generate a sandwich from the Dashboard.</li>
+		<li>Create an account (necessary for saving your randwiches and appearing on the leaderboard).</li>
+		<li>Generate a randwich from the Dashboard.</li>
 		<li>Order it. Upload a picture of it. Eat it. Love it.</li>
 		<li>Give it a review.</li>
 	</ol>

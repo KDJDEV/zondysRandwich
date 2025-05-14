@@ -1,25 +1,27 @@
 import { json } from "@sveltejs/kit";
 import { db } from "$lib/db";
 import { sandwiches, users } from "$lib/db/schema";
-import { eq, count, desc, and } from "drizzle-orm";
+import { eq, count, desc, and, isNotNull } from "drizzle-orm";
 
 export const GET = async () => {
+    const sandwichCount = count(sandwiches.id).as("sandwichCount");
+
     const result = await db
         .select({
             userId: users.id,
             username: users.username,
-            sandwichCount: count(sandwiches.id).as("sandwichCount")
+            sandwichCount
         })
         .from(users)
         .leftJoin(sandwiches, eq(users.id, sandwiches.userId))
         .where(
             and(
-                eq(sandwiches.starRating, sandwiches.starRating),
-                eq(sandwiches.imageUrl, sandwiches.imageUrl)
+                isNotNull(sandwiches.starRating),
+                isNotNull(sandwiches.imageUrl)
             )
         )
         .groupBy(users.id)
-        .orderBy(desc("sandwichCount"))
+        .orderBy(desc(sandwichCount))
         .limit(10);
 
     return json(result);

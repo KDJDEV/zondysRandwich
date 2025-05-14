@@ -108,8 +108,7 @@
 	{/if}
 	<p>
 		Ready to keep life interesting with a random sandwich? Click the button
-		below to generate one! There is only one simple rule: once you generate a
-		sandwich, you must order it! 😉
+		below to generate one!
 	</p>
 	<div class="text-center">
 		{#if sandwichesRemaining > 0}
