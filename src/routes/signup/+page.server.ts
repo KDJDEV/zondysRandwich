@@ -1,8 +1,7 @@
 import { auth } from "$lib/auth";
 import { fail } from "@sveltejs/kit";
-import nodemailer from "nodemailer";
+import Mailjet from "node-mailjet";
 import 'dotenv/config';
-import crypto from "crypto";
 
 import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from "obscenity";
 
@@ -11,46 +10,54 @@ const matcher = new RegExpMatcher({
     ...englishRecommendedTransformers,
 });
 
-const transporter = nodemailer.createTransport({
-    host: "in-v3.mailjet.com",
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.MJ_APIKEY_PUBLIC,
-        pass: process.env.MJ_APIKEY_PRIVATE
-    }
-});
+// Initialize Mailjet client
+const mailjet = Mailjet.apiConnect(
+    process.env.MJ_APIKEY_PUBLIC,
+    process.env.MJ_APIKEY_PRIVATE
+);
 
-async function sendVerificationEmail(email, username, verificationToken) {
+async function sendVerificationEmail(email: string, username: string, verificationToken: string) {
     const verificationUrl = `https://zondys.com/verify-email?token=${verificationToken}`;
 
-    await transporter.sendMail({
-        from: '"Zondy\'s Randwich" <no-reply@zondys.com>',
-        to: email,
-        subject: "Verify your Zondy\'s Randwich account",
-        text: `Hello ${username}, 
+    await mailjet
+        .post("send", { version: "v3.1" })
+        .request({
+            Messages: [
+                {
+                    From: {
+                        Email: "no-reply@zondys.com",
+                        Name: "Zondy's Randwich"
+                    },
+                    To: [
+                        {
+                            Email: email,
+                            Name: username
+                        }
+                    ],
+                    Subject: "Verify your Zondy's Randwich account",
+                    TextPart: `Hello ${username},
 
 Please verify your account by clicking this link: ${verificationUrl}
 
 If you did not try to sign up, you can safely ignore this email.`,
-        html: `<p>Hello ${username},</p>
-           <p>Please verify your account by clicking this link:</p>
-           <a href="${verificationUrl}">${verificationUrl}</a>
-           <p>If you did not try to sign up, you can safely ignore this email.</p>`
-    });
+                    HTMLPart: `<p>Hello ${username},</p>
+                               <p>Please verify your account by clicking this link:</p>
+                               <a href="${verificationUrl}">${verificationUrl}</a>
+                               <p>If you did not try to sign up, you can safely ignore this email.</p>`
+                }
+            ]
+        });
 
-    //console.log(`Verification email sent to ${email} with token: ${verificationToken}`);
+    console.log(`Verification email sent to ${email} with token: ${verificationToken}`);
 }
 
 export const actions = {
     async default(event) {
         const data = await event.request.formData();
-        const username = data.get("username");
-        const email = data.get("email");
-        const password = data.get("password");
-        const passwordConfirm = data.get("password-confirm");
-
-        //console.log("Form data:", { username, email, password, passwordConfirm });
+        const username = data.get("username")?.toString();
+        const email = data.get("email")?.toString();
+        const password = data.get("password")?.toString();
+        const passwordConfirm = data.get("password-confirm")?.toString();
 
         // Validation checks
         if (!username) return fail(422, { username, error: "A username is required." });

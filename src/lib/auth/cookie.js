@@ -11,7 +11,7 @@ import {
   deleteSessionTokenCookie,
   invalidateSession,
 } from "$lib/auth/sessionService";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 const log = debug("app:lib:auth:cookie");
 
