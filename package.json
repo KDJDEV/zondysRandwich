@@ -58,6 +58,7 @@
     "drizzle-orm": "^0.41.0",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
+    "obscenity": "^0.4.4",
     "openai": "^4.93.0",
     "postgres": "^3.4.5",
     "sharp": "^0.34.1"

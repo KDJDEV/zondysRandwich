@@ -2,6 +2,14 @@ import { auth } from "$lib/auth";
 import { AUTH_TOKEN_EXPIRY_SECONDS } from "$lib/constants.server";
 import { fail, redirect } from "@sveltejs/kit";
 
+// Obscenity filter imports
+import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from "obscenity";
+
+const matcher = new RegExpMatcher({
+    ...englishDataset.build(),
+    ...englishRecommendedTransformers,
+});
+
 export const actions = {
     async default(event) {
         const data = await event.request.formData();
@@ -10,9 +18,19 @@ export const actions = {
         const passwordConfirm = data.get("password-confirm");
 
         console.log("Form data:", { password, passwordConfirm });
-        
+
+        // Validation checks
         if (!username)
             return fail(422, { username, error: "A username is required." });
+
+        // Obscenity check for username
+        if (matcher.hasMatch(username)) {
+            return fail(422, {
+                username,
+                error: "Please choose a different username.",
+            });
+        }
+
         if (!password)
             return fail(422, { username, error: "A password is required." });
         if (password.length < 8)
@@ -65,20 +83,9 @@ export const actions = {
             return fail(500, { username, error });
         }
 
-        
         const user = login_resp.value;
         delete user.password;
-        /*
-        if (user?.id && user?.token) {
-            // TODO: duplicated in login page
-            event.cookies.set("auth_token", `${user.id}:${user.token}`, {
-                path: "/",
-                maxAge: AUTH_TOKEN_EXPIRY_SECONDS,
-            });
-        }
 
-        delete user.token;
-        */
         return { user };
     },
 };
