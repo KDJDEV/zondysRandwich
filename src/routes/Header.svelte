@@ -2,6 +2,7 @@
 	import { session } from "$lib/stores/session";
 	import { onMount } from "svelte";
 	import { theme } from "$lib/stores/theme";
+	import { page } from "$app/stores";
 	import {
 		faBars,
 		faChartLine,
@@ -16,41 +17,18 @@
 	import Fa from "svelte-fa";
 	import "../app.postcss";
 
+	$: currentPath = $page.url.pathname;
+
 	$: menu_items = $session?.user
 		? [
-				{
-					href: "/dashboard",
-					icon: faChartLine,
-					label: "Dashboard",
-				},
-				{
-					href: "/",
-					icon: faHouse,
-					label: "Home",
-				},
-				{
-					href: `/dashboard/history?userId=${$session?.user.id}`,
-					icon: faBook,
-					label: "Sandwich History",
-				},
-				{
-					href: "/logout",
-					icon: faSignOut,
-					label: "Log Out",
-					reload: true,
-				},
+				{ href: "/dashboard", icon: faChartLine, label: "Dashboard" },
+				{ href: "/", icon: faHouse, label: "Home" },
+				{ href: `/dashboard/history?userId=${$session?.user.id}`, icon: faBook, label: "Sandwich History" },
+				{ href: "/logout", icon: faSignOut, label: "Log Out", reload: true },
 		  ]
 		: [
-				{
-					href: "/login",
-					icon: faSignIn,
-					label: "Log In",
-				},
-				{
-					href: "/signup",
-					icon: faHeart,
-					label: "Sign Up",
-				},
+				{ href: "/login", icon: faSignIn, label: "Log In" },
+				{ href: "/signup", icon: faHeart, label: "Sign Up" },
 		  ];
 
 	onMount(async () => {
@@ -76,16 +54,10 @@
 				<Fa icon={faBars} />
 				Menu
 			</label>
-			<ul
-				tabindex="0"
-				class="dropdown-content menu p-2 shadow-md bg-primary rounded-box w-52"
-			>
+			<ul tabindex="0" class="dropdown-content menu p-2 shadow-md bg-primary rounded-box w-52">
 				{#each menu_items as item}
 					<li>
-						<a
-							href={item.href}
-							data-sveltekit-reload={item.reload ? "" : "off"}
-						>
+						<a href={item.href} data-sveltekit-reload={item.reload ? "" : "off"}>
 							<Fa icon={item.icon} />
 							{item.label}
 						</a>
@@ -95,14 +67,17 @@
 		</nav>
 	</div>
 
+	{#if $session?.user && !$session.user.emailVerified && currentPath !== '/email-verified'}
+		<div class="max-w-screen-md mx-auto mb-12 p-2 bg-yellow-200 text-yellow-900 text-center rounded">
+			Please verify your email to activate your account. 
+			<span class="font-semibold">Check your inbox for the verification email we sent.</span>
+		</div>
+	{/if}
+
 	{#if theme}
-		<div
-			class="sm:absolute max-w-screen-md mx-auto text-center pb-3 sm:-translate-y-10 sm:left-1/2 sm:-translate-x-1/2"
-		>
+		<div class="sm:absolute max-w-screen-md mx-auto text-center pb-3 sm:-translate-y-10 sm:left-1/2 sm:-translate-x-1/2">
 			<p class="text-sm italic text-base-200">
-				Today's Theme: <span class="font-semibold text-secondary"
-					>{$theme ? $theme : ""}</span
-				>
+				Today's Theme: <span class="font-semibold text-secondary">{$theme}</span>
 			</p>
 		</div>
 	{/if}

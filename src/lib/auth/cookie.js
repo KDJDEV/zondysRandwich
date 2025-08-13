@@ -11,7 +11,7 @@ import {
   deleteSessionTokenCookie,
   invalidateSession,
 } from "$lib/auth/sessionService";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 const log = debug("app:lib:auth:cookie");
 
@@ -30,13 +30,13 @@ export const cookie = {
     return ok(user);
   },
 
-  async login({ username, password, opts }) {
+  async login({ email, password, opts }) {
     if (!opts?.cookies) return err(new Error("Missing cookies"));
 
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.username, username))
+      .where(eq(users.email, email))
       .limit(1);
 
     if (!user) return err(new Error("User not found"));
@@ -53,33 +53,65 @@ export const cookie = {
     return ok(user);
   },
 
-  async signup({ username, password, passwordConfirm, opts }) {
+
+  async signup({ username, email, password, passwordConfirm, opts }) {
     if (!opts?.cookies) return err(new Error("Missing cookies"));
-    console.log(username, password, passwordConfirm)
     if (!username || !password) return err(new Error("Missing fields"));
     if (password !== passwordConfirm) return err(new Error("Passwords do not match"));
 
-    const [existing] = await db
+    // Check if username is already taken
+    const [existingUsername] = await db
       .select()
       .from(users)
       .where(eq(users.username, username))
       .limit(1);
 
-    if (existing) return err(new Error("Username is already registered"));
+    if (existingUsername) return err(new Error("Username is already registered"));
 
+    // Validate email domain
+    const emailDomain = email.split("@")[1]?.toLowerCase();
+    if (emailDomain !== "taylor.edu") {
+      return err(new Error("Email must be a @taylor.edu address"));
+    }
+
+    // **Check if email is already registered and verified**
+    const [existingVerifiedEmail] = await db
+      .select()
+      .from(users)
+      .where(
+        eq(users.email, email)
+      )
+      .limit(1);
+
+    if (existingVerifiedEmail) {
+      return err(new Error("An account with this email has already been created."));
+    }
+
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create verification token
+    const verificationToken = crypto.randomUUID();
+    const expiryDate = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24h expiry
 
     const [newUser] = await db
       .insert(users)
       .values({
         username,
+        email,
         password: hashedPassword,
+        emailVerified: false,
+        verificationToken,
+        verificationTokenExpires: expiryDate
       })
-      .returning({ id: users.id, username: users.username });
+      .returning({
+        id: users.id,
+        username: users.username,
+        verificationToken: users.verificationToken
+      });
 
     const token = generateSessionToken();
     const session = await createSession(token, newUser.id);
-
     setSessionTokenCookie(opts, token, session.expiresAt);
 
     return ok(newUser);

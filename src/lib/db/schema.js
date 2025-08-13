@@ -3,7 +3,11 @@ import { pgTable, serial, text, varchar, integer, timestamp, boolean } from "dri
 export const users = pgTable('users', {
 	id: serial('id').primaryKey(),
 	username: text('username').unique().notNull(),
+	email: text("email").unique().notNull(),
 	password: varchar('password', { length: 256 }),
+	emailVerified: boolean("email_verified").default(false),
+    verificationToken: text("verification_token"),
+    verificationTokenExpires: timestamp("verification_token_expires")
 });
 
 export const sessions = pgTable("session", {

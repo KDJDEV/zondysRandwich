@@ -29,9 +29,6 @@
 
                 await applyAction(result);
 
-                // TODO: this is kinda a hack since redirecting in the
-                // action doesn't work because we can't also update page
-                // data.
                 if (result.type === "success") {
                     const user = result.data?.user;
                     if (user) $session.user = user;
@@ -47,13 +44,15 @@
                 </div>
             </div>
         {/if}
+
+        <!-- changed input name from "username" to "email" -->
         <p>
             <input
-                type="text"
-                name="username"
-                placeholder="Username..."
+                type="email"
+                name="email"
+                placeholder="Email..."
                 class="input input-bordered w-full"
-                value={form?.username || ''}
+                value={form?.email || ''}
                 required
             />
         </p>     

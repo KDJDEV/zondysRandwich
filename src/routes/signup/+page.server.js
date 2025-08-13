@@ -1,8 +1,9 @@
 import { auth } from "$lib/auth";
-import { AUTH_TOKEN_EXPIRY_SECONDS } from "$lib/constants.server";
-import { fail, redirect } from "@sveltejs/kit";
+import { fail } from "@sveltejs/kit";
+import nodemailer from "nodemailer";
+import 'dotenv/config';
+import crypto from "crypto";
 
-// Obscenity filter imports
 import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from "obscenity";
 
 const matcher = new RegExpMatcher({
@@ -10,80 +11,101 @@ const matcher = new RegExpMatcher({
     ...englishRecommendedTransformers,
 });
 
+const transporter = nodemailer.createTransport({
+    host: "in-v3.mailjet.com",
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.MJ_APIKEY_PUBLIC,
+        pass: process.env.MJ_APIKEY_PRIVATE
+    }
+});
+
+async function sendVerificationEmail(email, username, verificationToken) {
+    const verificationUrl = `https://zondys.com/verify-email?token=${verificationToken}`;
+
+    await transporter.sendMail({
+        from: '"Zondy\'s Randwich" <no-reply@zondys.com>',
+        to: email,
+        subject: "Verify your Zondy\'s Randwich account",
+        text: `Hello ${username}, 
+
+Please verify your account by clicking this link: ${verificationUrl}
+
+If you did not try to sign up, you can safely ignore this email.`,
+        html: `<p>Hello ${username},</p>
+           <p>Please verify your account by clicking this link:</p>
+           <a href="${verificationUrl}">${verificationUrl}</a>
+           <p>If you did not try to sign up, you can safely ignore this email.</p>`
+    });
+
+    //console.log(`Verification email sent to ${email} with token: ${verificationToken}`);
+}
+
 export const actions = {
     async default(event) {
         const data = await event.request.formData();
         const username = data.get("username");
+        const email = data.get("email");
         const password = data.get("password");
         const passwordConfirm = data.get("password-confirm");
 
-        console.log("Form data:", { password, passwordConfirm });
+        //console.log("Form data:", { username, email, password, passwordConfirm });
 
         // Validation checks
-        if (!username)
-            return fail(422, { username, error: "A username is required." });
+        if (!username) return fail(422, { username, error: "A username is required." });
+        if (!email) return fail(422, { username, error: "An email is required." });
 
-        // Obscenity check for username
+        // Email must be @taylor.edu
+        const domain = email.split("@")[1]?.toLowerCase();
+        if (domain !== "taylor.edu") return fail(422, { username, error: "Email must be a @taylor.edu address." });
+
+        // Obscenity check
         if (matcher.hasMatch(username)) {
-            return fail(422, {
-                username,
-                error: "Please choose a different username.",
-            });
+            return fail(422, { username, error: "Please choose a different username." });
         }
 
-        if (!password)
-            return fail(422, { username, error: "A password is required." });
-        if (password.length < 8)
-            return fail(422, {
-                username,
-                error: "Password must be at least 8 characters long.",
-            });
-        if (password.length > 32)
-            return fail(422, {
-                username,
-                error: "Password cannot be more than 32 characters long.",
-            });
-        if (username.length > 32)
-            return fail(422, {
-                username,
-                error: "Username cannot be more than 32 characters long.",
-            });
-        if (password !== passwordConfirm)
-            return fail(422, {
-                username,
-                error: "Your passwords must match.",
-            });
+        // Password checks
+        if (!password) return fail(422, { username, error: "A password is required." });
+        if (password.length < 8) return fail(422, { username, error: "Password must be at least 8 characters long." });
+        if (password.length > 32) return fail(422, { username, error: "Password cannot be more than 32 characters long." });
+        if (username.length > 32) return fail(422, { username, error: "Username cannot be more than 32 characters long." });
+        if (password !== passwordConfirm) return fail(422, { username, error: "Your passwords must match." });
 
-        const signup_resp = await auth.signup({
+        // Signup
+        const signupResp = await auth.signup({
             username,
+            email,
             password,
             passwordConfirm,
             opts: { cookies: event.cookies },
         });
 
-        if (signup_resp.isErr()) {
-            const error = (
-                String(signup_resp.error) ??
-                "There was an issue creating your account. Please try again."
-            ).trim();
-            return fail(500, { username, error });
+        if (signupResp.isErr()) {
+            return fail(500, { username, error: String(signupResp.error) });
         }
 
-        // Sign the user in immediately
-        const login_resp = await auth.login({
-            username,
+        const newUser = signupResp.value;
+
+        // Send verification email
+        try {
+            await sendVerificationEmail(email, username, newUser.verificationToken);
+        } catch (err) {
+            console.error("Email send failed:", err);
+        }
+
+        // Sign in immediately
+        const loginResp = await auth.login({
+            email,
             password,
             opts: { cookies: event.cookies },
         });
 
-        if (login_resp.isErr()) {
-            const error = (
-                String(login_resp.error) ?? "Could not sign you in. Please try again."
-            ).trim();
-            return fail(500, { username, error });
+        if (loginResp.isErr()) {
+            return fail(500, { username, error: String(loginResp.error) });
         }
 
-        const user = login_resp.value;
+        const user = loginResp.value;
         delete user.password;
 
         return { user };
