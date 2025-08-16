@@ -203,9 +203,9 @@
 </script>
 <div class="w-full flex justify-start mb-4 px-4">
       <button
-    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition 
-           relative lg:absolute lg:mr-50 lg:top-50 
-           left-1/2 transform -translate-x-1/2 mb-4"
+    class="px-4 py-2 text-white rounded bg-blue-600 hover:bg-blue-700 transition 
+           relative lg:absolute lg:mr-50 lg:top-50 lg:left-40
+           left-1/2 transform -translate-x-1/2"
     on:click={() => goto("/dashboard")}
 >
     ← Back to Dashboard
