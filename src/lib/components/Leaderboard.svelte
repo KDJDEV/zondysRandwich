@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from "svelte";
 
-	let leaderboard = [];
+	let leaderboard = { allTime: [], thisMonth: [] };
 
 	onMount(async () => {
 		const response = await fetch("/api/leaderboard");
@@ -13,43 +13,70 @@
 	});
 </script>
 
-<div class="mt-8">
-	<h2 class="text-2xl font-semibold mb-4">Leaderboard</h2>
-	<table class="leaderboard-table w-full border-collapse shadow-lg">
-		<thead>
-			<tr>
-				<th class="px-4 py-2 text-left">Pos</th>
-				<th class="px-4 py-2 text-left">User Name</th>
-				<th class="px-4 py-2 text-left">Sandwiches</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each leaderboard as { username, sandwichCount }, index}
-				<tr class="leaderboard-item">
-					<td class="px-4 py-2">{index + 1}</td>
-					<td class="px-4 py-2">{username}</td>
-					<td class="px-4 py-2">{sandwichCount}</td>
+<div class="mt-8 space-y-12">
+	<!-- This Month Leaderboard -->
+	<section>
+		<h2 class="text-2xl font-semibold mb-4">This Month Leaderboard</h2>
+		<table class="leaderboard-table">
+			<thead>
+				<tr>
+					<th>Pos</th>
+					<th>User Name</th>
+					<th>Sandwiches</th>
 				</tr>
-			{/each}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				{#each leaderboard.thisMonth as { username, sandwichCount }, index}
+					<tr class="leaderboard-item">
+						<td>{index + 1}</td>
+						<td>{username}</td>
+						<td>{sandwichCount}</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</section>
+	
+	<!-- All Time Leaderboard -->
+	<section>
+		<h2 class="text-2xl font-semibold mb-4">All Time Leaderboard</h2>
+		<table class="leaderboard-table">
+			<thead>
+				<tr>
+					<th>Pos</th>
+					<th>User Name</th>
+					<th>Sandwiches</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#each leaderboard.allTime as { username, sandwichCount }, index}
+					<tr class="leaderboard-item">
+						<td>{index + 1}</td>
+						<td>{username}</td>
+						<td>{sandwichCount}</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</section>
+
+	
 </div>
 
 <style>
-
 	.leaderboard-table {
 		width: 100%;
 		border-collapse: collapse;
 		background-color: #222;
 		color: white;
-        font-family: "Press Start 2P", system-ui;
+		font-family: "Press Start 2P", system-ui;
 		font-weight: 400;
 	}
 
 	.leaderboard-table th,
 	.leaderboard-table td {
 		border: 2px solid #ffffff;
-        color: white;
+		color: white;
 		text-align: left;
 		padding: 8px 16px;
 	}

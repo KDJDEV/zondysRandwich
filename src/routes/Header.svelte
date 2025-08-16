@@ -45,7 +45,7 @@
 		<h1>
 			<a href={$session?.user ? "/dashboard" : "/"} class="btn btn-ghost gap-3">
 				<img src="/favicon.png" class="w-10 h-10" />
-				Zondy's Randwich
+				Zondy's <br/> Randwich
 			</a>
 		</h1>
 
@@ -67,7 +67,7 @@
 		</nav>
 	</div>
 
-	{#if $session?.user && !$session.user.emailVerified && currentPath !== '/email-verified'}
+	{#if $session?.user && !$session.user.emailVerified && currentPath !== '/email-verified'  && currentPath !== '/verify-email'}
 		<div class="max-w-screen-md mx-auto mb-12 p-2 bg-yellow-200 text-yellow-900 text-center rounded">
 			Please verify your email to activate your account. 
 			<span class="font-semibold">Check your inbox for the verification email we sent.</span>
@@ -77,7 +77,7 @@
 	{#if theme}
 		<div class="sm:absolute max-w-screen-md mx-auto text-center pb-3 sm:-translate-y-10 sm:left-1/2 sm:-translate-x-1/2">
 			<p class="text-sm italic text-base-200">
-				Today's Theme: <span class="font-semibold text-secondary">{$theme}</span>
+				Today's Theme: <span class="font-semibold text-secondary">{$theme ? $theme : ""}</span>
 			</p>
 		</div>
 	{/if}

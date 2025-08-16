@@ -1,13 +1,14 @@
 <script>
 	import { confetti } from "@neoconfetti/svelte";
 	import { page } from "$app/stores";
-	// @ts-ignore
+	import { session } from "$lib/stores/session";
 	import { onMount } from "svelte";
 	import StarRating from "$lib/components/StarRating.svelte";
 	import PhotoUpload from "$lib/components/PhotoUpload.svelte";
 	import Fa from "svelte-fa";
 	import { faWarning } from "@fortawesome/free-solid-svg-icons";
 	import { goto } from "$app/navigation";
+	import Comments from "$lib/components/Comments.svelte";
 
 	$: created = $page.url.searchParams.get("created") === "true";
 
@@ -95,7 +96,17 @@
 			if (result.success) {
 				goto("/dashboard?success=true");
 			} else {
-				console.error("Failed to submit rating", result.error);
+				if (
+					response.status === 422 &&
+					result.error === "Comments contain inappropriate language."
+				) {
+					error =
+						"Your comment contains inappropriate language. Please remove it and try again.";
+					return;
+				} else {
+					console.error("Failed to submit rating", result.error);
+					error = "Failed to submit rating. Please try again later.";
+				}
 			}
 		} catch (error) {
 			console.error("Error submitting rating", error);
@@ -156,8 +167,51 @@
 			alert("An error occurred while deleting the sandwich.");
 		}
 	}
-</script>
 
+	let voteLoading = false;
+
+	async function toggleVote() {
+		if (voteLoading) return;
+		voteLoading = true;
+
+		const originalHasVoted = sandwich.hasVoted;
+		const originalVoteCount = Number(sandwich.voteCount);
+
+		// Optimistically update
+		sandwich.hasVoted = !sandwich.hasVoted;
+		sandwich.voteCount = originalVoteCount + (sandwich.hasVoted ? 1 : -1);
+
+		try {
+			const res = await fetch(`/api/vote/${sandwich.id}`, {
+				method: "POST",
+			});
+
+			if (!res.ok) throw new Error("Failed to toggle vote");
+			const data = await res.json();
+
+			sandwich.hasVoted = data.hasVoted;
+			sandwich.voteCount = Number(data.voteCount);
+		} catch (err) {
+			console.error(err);
+			// revert on error
+			sandwich.hasVoted = originalHasVoted;
+			sandwich.voteCount = originalVoteCount;
+		} finally {
+			voteLoading = false;
+		}
+	}
+</script>
+<div class="w-full flex justify-start mb-4 px-4">
+      <button
+    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition 
+           relative lg:absolute lg:mr-50 lg:top-50 
+           left-1/2 transform -translate-x-1/2 mb-4"
+    on:click={() => goto("/dashboard")}
+>
+    ← Back to Dashboard
+</button>
+
+    </div>
 {#if sandwich}
 	{#if created}
 		<div
@@ -217,23 +271,38 @@
 			{toppingsText}
 		</p>
 		<p><strong>🍅 Sauce:</strong> {sandwich.sauce}</p>
+		<div class="mt-4 flex items-center gap-3 m-auto w-fit">
+			<button
+				class="px-4 py-2 rounded text-white font-semibold"
+				class:bg-red-500={sandwich.hasVoted}
+				class:bg-gray-400={!sandwich.hasVoted}
+				disabled={voteLoading}
+				on:click={toggleVote}
+			>
+				{sandwich.hasVoted ? "Unvote ❤️" : "Upvote 🤍"}
+			</button>
+			<span class="text-gray-700 font-medium">{sandwich.voteCount} upvotes</span
+			>
+		</div>
 		{#if data.user?.id === sandwich.userId && !alreadyInDB}
 			{#if sandwichesRemaining > 0}
-			<button
-			class="mt-3 m-auto flex items-center gap-2 px-6 py-3 bg-yellow-500 border-2 border-yellow-600 text-white hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium rounded-full transition-all duration-200 shadow-lg"
-			on:click={rerollSandwhich}
-			disabled={loading}
-		  >
-			{#if loading}
-			  <span class="animate-spin text-xl">🔁</span>
-			  <span>Rerolling...</span>
-			{:else}
-			  <span class="text-xl">🎲</span>
-			  <span>Reroll Sandwich</span>
-			{/if}
-			<p class="text-black">({sandwichesRemaining} {sandwichesRemaining == 1 ? "roll" : "rolls"} remaining today)</p>
-		  </button>
-		  
+				<button
+					class="mt-3 m-auto flex items-center gap-2 px-6 py-3 bg-yellow-500 border-2 border-yellow-600 text-white hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium rounded-full transition-all duration-200 shadow-lg"
+					on:click={rerollSandwhich}
+					disabled={loading}
+				>
+					{#if loading}
+						<span class="animate-spin text-xl">🔁</span>
+						<span>Rerolling...</span>
+					{:else}
+						<span class="text-xl">🎲</span>
+						<span>Reroll Sandwich</span>
+					{/if}
+					<p class="text-black">
+						({sandwichesRemaining}
+						{sandwichesRemaining == 1 ? "roll" : "rolls"} remaining today)
+					</p>
+				</button>
 			{:else}
 				<p class="text-yellow-700 text-sm mt-2">
 					You can't reroll because you've used all your rolls for today.
@@ -262,7 +331,7 @@
 				<p>{@html orderText}</p>
 			</div>
 
-			{#if sandwich.userId && data.user?.id === sandwich.userId}
+			{#if sandwich.userId}
 				{#if !alreadyInDB}
 					<button class="generate mt-5" on:click={() => (ordered = true)}>
 						<span class="text-2xl" />I've ordered my sandwich<span
@@ -272,7 +341,11 @@
 				{:else}
 					<div class="text-left p-3 rounded-lg border border-gray-300">
 						{#if data.user?.id === sandwich.userId}
-							<p class="text-gray-500">Your review:</p>
+							<p class="text-gray-500">
+								{data.user?.id === sandwich.userId
+									? "Your review:"
+									: sandwich.username + "'s review:"}
+							</p>
 						{:else}
 							<p class="text-gray-500">{sandwich.username}'s review:</p>
 						{/if}
@@ -290,79 +363,93 @@
 			{/if}
 		{:else}
 			<div>
-				<p class="mt-5 text-green-500 font-bold">Enjoy your sandwich! 🎉</p>
-				<h2 class="text-xl font-bold">Three last steps</h2>
+				{#if $session?.user && $session.user.emailVerified}
+					<p class="mt-5 text-green-500 font-bold">Enjoy your sandwich! 🎉</p>
+					<h2 class="text-xl font-bold">Three last steps</h2>
 
-				<div
-					class="border-2 border-dashed border-primary p-4 my-4 rounded-lg bg-base-100 text-left"
-				>
-					{#if !alreadyInDB}
-						<h2 class="text-lg font-semibold mt-3">
-							1. Upload a photo of your sandwich <p class="text-red-600 inline">
-								(BEFORE EATING)
+					<div
+						class="border-2 border-dashed border-primary p-4 my-4 rounded-lg bg-base-100 text-left"
+					>
+						{#if !alreadyInDB}
+							<h2 class="text-lg font-semibold mt-3">
+								1. Upload a photo of your sandwich <p
+									class="text-red-600 inline"
+								>
+									(BEFORE EATING)
+								</p>
+							</h2>
+							<p class="text-gray-500 mb-3">
+								(Please only upload pictures of your randwich. Anything else
+								will be removed from the site, and offenders will be permanently
+								banned from the site. Please keep it fun and respectful for
+								everyone.)
 							</p>
-						</h2>
-						<p class="text-gray-500 mb-3">
-							(this is used for verification purposes for the leaderboard)
-						</p>
-					{/if}
-					<PhotoUpload
-						{photoUrl}
-						onUpload={handlePhotoUpload}
-						sandwichId={sandwich.id}
-					/>
-					{#if photoUrl}
-						<p class="mt-2 text-gray-500">Photo uploaded successfully!</p>
-					{/if}
-					{#if error}
-						<div class="alert alert-error mb-2">
-							<div>
-								<Fa icon={faWarning} />
-								{error}
+						{/if}
+						<PhotoUpload
+							{photoUrl}
+							onUpload={handlePhotoUpload}
+							sandwichId={sandwich.id}
+						/>
+						{#if photoUrl}
+							<p class="mt-2 text-gray-500">Photo uploaded successfully!</p>
+						{/if}
+						{#if error}
+							<div class="alert alert-error mb-2">
+								<div>
+									<Fa icon={faWarning} />
+									{error}
+								</div>
+							</div>
+						{/if}
+						{#if !alreadyInDB}
+							<label class="text-lg font-semibold mt-3 block mb-3"
+								>2. Eat your sandwich</label
+							>
+						{/if}
+						{#if !alreadyInDB}
+							<label class="text-lg font-semibold mt-3"
+								>3. Rate your sandwich</label
+							>
+						{/if}
+						<div>
+							<StarRating bind:rate={rating} />
+							{#if rating}
+								<p>{rating} Stars</p>
+							{:else}
+								<p class="text-gray-500">Please rate your sandwich</p>
+							{/if}
+							<div class="mt-4">
+								<label
+									for="comments"
+									class="block text-gray-700 font-semibold mb-2"
+									>Optional Comments</label
+								>
+								<textarea
+									id="comments"
+									placeholder="Share your thoughts here..."
+									bind:value={comments}
+									class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none min-h-[80px] transition-all"
+								/>
 							</div>
 						</div>
-					{/if}
-					{#if !alreadyInDB}
-						<label class="text-lg font-semibold mt-3 block mb-3"
-							>2. Eat your sandwich</label
+						<button
+							class="generate mt-5 m-auto block mb-3"
+							on:click={submitRating}
 						>
-					{/if}
-					{#if !alreadyInDB}
-						<label class="text-lg font-semibold mt-3"
-							>3. Rate your sandwich</label
-						>
-					{/if}
-					<div>
-						<StarRating bind:rate={rating} />
-						{#if rating}
-							<p>{rating} Stars</p>
-						{:else}
-							<p class="text-gray-500">Please rate your sandwich</p>
-						{/if}
-						<div class="mt-4">
-							<label
-								for="comments"
-								class="block text-gray-700 font-semibold mb-2"
-								>Optional Comments</label
-							>
-							<textarea
-								id="comments"
-								placeholder="Share your thoughts here..."
-								bind:value={comments}
-								class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none min-h-[80px] transition-all"
-							/>
-						</div>
+							Submit rating
+						</button>
 					</div>
-					<button
-						class="generate mt-5 m-auto block mb-3"
-						on:click={submitRating}
-					>
-						Submit rating
-					</button>
-				</div>
+				{:else}
+					<p class="mt-5 text-red-500 font-bold">
+						You must verify your email before you can rate your sandwiches.
+					</p>
+				{/if}
 			</div>
 		{/if}
 	</div>
+	{#if alreadyInDB}
+		<Comments sandwichId={sandwich.id} />
+	{/if}
 {:else}
 	<p>Sandwich not found.</p>
 {/if}

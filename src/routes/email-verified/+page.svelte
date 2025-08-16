@@ -6,7 +6,7 @@
         Thank you! Your email has been successfully verified. 
         You can now use all features of Zondy's Randwich.
       </p>
-      <a href="/dashboard" class="btn btn-primary w-full">Go to Dashboard</a>
+      <a href="/dashboard" class="btn btn-primary text-white w-full">Go to Dashboard</a>
     </div>
   </div>
 </div>

@@ -3,6 +3,7 @@
 	import { page } from "$app/stores";
 	import { onMount } from "svelte";
 	import Leaderboard from "$lib/components/Leaderboard.svelte";
+	import SocialFeed from "$lib/components/SocialFeed.svelte";
 	export let data;
 	$: success = $page.url.searchParams.get("success") === "true";
 	$: deleted = $page.url.searchParams.get("deleted") === "true";
@@ -10,7 +11,7 @@
 	let loading = false;
 	let result = null;
 	let error = null;
-	let sandwichesRemaining = 3;
+	let sandwichesRemaining = null;
 	async function checkSandwichLimit() {
 		try {
 			const res = await fetch(`/api/countToday`);
@@ -87,11 +88,15 @@
 	{#if data.user}
 		{#if sandwichesRemaining < 1}
 			<p class="text-sm text-red-600 font-semibold">
-				Daily rolls remaining: {sandwichesRemaining}
+				Daily rolls remaining: {sandwichesRemaining || sandwichesRemaining === 0
+					? sandwichesRemaining
+					: ""}
 			</p>
 		{:else}
 			<p class="text-sm text-black font-semibold">
-				Daily rolls remaining: {sandwichesRemaining}
+				Daily rolls remaining: {sandwichesRemaining || sandwichesRemaining === 0
+					? sandwichesRemaining
+					: ""}
 			</p>
 		{/if}
 	{/if}
@@ -121,12 +126,15 @@
 					>
 				{/if}
 			</button>
-		{:else}
-			<p class="text-red-600 font-bold">You're out of randwich rolls for today. Please come back tomorrow.</p>
+		{:else if sandwichesRemaining === 0}
+			<p class="text-red-600 font-bold">
+				You're out of randwich rolls for today. Please come back tomorrow.
+			</p>
 		{/if}
 		{#if loading}
 			<img class="w-96 m-auto" src="/sandwich.gif" alt="A delicious sandwich" />
 		{/if}
 	</div>
 	<Leaderboard />
+	<SocialFeed />
 </section>

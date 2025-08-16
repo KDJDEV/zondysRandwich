@@ -1,0 +1,61 @@
+import { db } from "$lib/db";
+import { sandwiches } from "$lib/db/schema";
+
+
+function randomItem(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+const breadOptions = ["Pretzel bun", "Brioche", "Sourdough", "Ciabatta", "Rye"];
+const proteinOptions = ["Salami", "Turkey", "Chicken", "Ham", "Roast beef", "Tofu"];
+const cheeseOptions = ["Pepper jack", "Cheddar", "Swiss", "Mozzarella", "Gouda"];
+const toppingOptions = ["Lettuce", "Pickle", "Tomato", "Banana peppers", "Oregano", "Onion", "Spinach", "Cucumber"];
+const sauceOptions = ["Whole grain mustard", "Mayo", "Chipotle aioli", "Pesto", "Honey mustard"];
+const fixedImageUrl = "https://cqthaatacrjtizijviwf.supabase.co/storage/v1/object/public/sandwiches/uploads/00bf6528a41b03c67e715f719cf46fc0.jpg";
+
+function randomToppings() {
+  return toppingOptions.filter(() => Math.random() < 0.4);
+}
+function randomStarRating() {
+  return Math.floor(Math.random() * 5) + 1;
+}
+function randomDate() {
+  const now = Date.now();
+  const past = now - 1000 * 60 * 60 * 24 * 30;
+  return new Date(past + Math.random() * (now - past));
+}
+function generateSandwich(userId = null) {
+  const bread = randomItem(breadOptions);
+  const protein = randomItem(proteinOptions);
+  const cheese = randomItem(cheeseOptions);
+  const toppings = randomToppings();
+  const sauce = randomItem(sauceOptions);
+  return {
+    bread,
+    protein,
+    cheese,
+    toppings,
+    sauce,
+    userId: 34,
+    name: `${protein} ${bread} Delight`,
+    comments: "Tasty!",
+    starRating: randomStarRating(),
+    imageUrl: fixedImageUrl,
+    createdAt: randomDate(),
+    rerolled: false,
+    deleted: false
+  };
+}
+
+export async function GET({ url }) {
+  const count = Number(url.searchParams.get('count')) || 1;
+  const fakeSandwiches = Array.from({ length: count }, () => generateSandwich());
+  try {
+    for (const sandwich of fakeSandwiches) {
+      await db.insert(sandwiches).values(sandwich);
+    }
+    return new Response(JSON.stringify({ success: true, inserted: count }), { status: 200 });
+  } catch (err) {
+    return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500 });
+  }
+}

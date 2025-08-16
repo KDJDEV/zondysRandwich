@@ -1,46 +1,50 @@
-import { json } from "@sveltejs/kit";
 import 'dotenv/config'
+import { json } from "@sveltejs/kit";
 import { db } from "$lib/db";
-import { sandwiches, users } from "$lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { sandwiches, users, sandwichVotes } from "$lib/db/schema";
+import { eq, and, sql } from "drizzle-orm";
 
-export const GET = async ({ params }) => {
-	const id = Number(params.id);
+export const GET = async ({ params, locals }) => {
+  const id = Number(params.id);
+  const userId = locals.user?.id ?? null;
 
-	if (isNaN(id)) {
-		return json({ error: 'invalid id' }, { status: 400 });
-	}
+  if (isNaN(id)) {
+    return json({ error: "invalid id" }, { status: 400 });
+  }
 
-	const result = await db
-		.select({
-			id: sandwiches.id,
-			name: sandwiches.name,
-			bread: sandwiches.bread,
-			protein: sandwiches.protein,
-			cheese: sandwiches.cheese,
-			toppings: sandwiches.toppings,
-			sauce: sandwiches.sauce,
-			userId: sandwiches.userId,
-			username: users.username, // may be null for anonymous
-			imageUrl: sandwiches.imageUrl,
-			starRating: sandwiches.starRating,
-			comments: sandwiches.comments,
-			createdAt: sandwiches.createdAt
-		})
-		.from(sandwiches)
-		.where(and(
-			eq(sandwiches.id, id),
-			eq(sandwiches.deleted, false)
-		))
-		.leftJoin(users, eq(sandwiches.userId, users.id));
+  const result = await db
+    .select({
+      id: sandwiches.id,
+      name: sandwiches.name,
+      bread: sandwiches.bread,
+      protein: sandwiches.protein,
+      cheese: sandwiches.cheese,
+      toppings: sandwiches.toppings,
+      sauce: sandwiches.sauce,
+      userId: sandwiches.userId,
+      username: users.username,
+      imageUrl: sandwiches.imageUrl,
+      starRating: sandwiches.starRating,
+      comments: sandwiches.comments,
+      createdAt: sandwiches.createdAt,
+      voteCount: sql`COUNT(${sandwichVotes.id})`,
+      hasVoted: userId
+        ? sql`BOOL_OR(${sandwichVotes.userId} = ${userId}::int)`
+        : sql`false`,
+    })
+    .from(sandwiches)
+    .leftJoin(users, eq(sandwiches.userId, users.id))
+    .leftJoin(sandwichVotes, eq(sandwiches.id, sandwichVotes.sandwichId))
+    .where(and(eq(sandwiches.id, id), eq(sandwiches.deleted, false)))
+    .groupBy(sandwiches.id, users.id);
 
-	const sandwich = result[0];
+  const sandwich = result[0];
 
-	if (!sandwich) {
-		return json({ error: 'sandwich not found' }, { status: 404 });
-	}
+  if (!sandwich) {
+    return json({ error: "sandwich not found" }, { status: 404 });
+  }
 
-	return json(sandwich);
+  return json(sandwich);
 };
 
 export const DELETE = async ({ params, locals }) => {
