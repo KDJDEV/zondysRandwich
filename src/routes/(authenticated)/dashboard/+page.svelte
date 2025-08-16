@@ -75,16 +75,17 @@
 	{/if}
 
 	<h1 class="flex items-center gap-4 mb-0">
-		Dashboard
-		{#if data.user}
-			<a
-				href={`/dashboard/history?userId=${data.user.id}`}
-				class="text-sm text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
-			>
-				View My Sandwich History
-			</a>
-		{/if}
-	</h1>
+    Dashboard
+    {#if data.user}
+        <a
+            href={`/dashboard/history?userId=${data.user.id}`}
+            class="ml-auto text-sm text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+        >
+            View My Sandwich History
+        </a>
+    {/if}
+</h1>
+
 	{#if data.user}
 		{#if sandwichesRemaining < 1}
 			<p class="text-sm text-red-600 font-semibold">

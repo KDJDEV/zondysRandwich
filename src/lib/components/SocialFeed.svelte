@@ -75,10 +75,10 @@
 			if (!res.ok) {
 				const data = await res.json();
 				console.log(data);
-				if (data.message === "Unauthorized"){
+				if (data.message === "Unauthorized") {
 					alert("You must be logged in to vote.");
 				}
-				if (data.message === "Email must be verified to vote"){
+				if (data.message === "Email must be verified to vote") {
 					alert("You must verify your email to vote.");
 				}
 				throw new Error("Failed to toggle vote");
@@ -165,65 +165,71 @@
 			class="sandwich-card border rounded p-4 mb-4 cursor-pointer hover:shadow-lg transition"
 			on:click={() => goto(`/dashboard/${sandwich.sandwichId}`)}
 		>
-			<div class="flex gap-4 items-start">
-				<!-- Image -->
-				<img
-					src={sandwich.imageUrl}
-					alt="Randwich"
-					class="w-24 h-24 object-cover rounded flex-shrink-0 mt-0"
-				/>
+			<div class="flex flex-col md:flex-row gap-4 items-start">
+  <!-- Image -->
+  <img
+    src={sandwich.imageUrl}
+    alt="Randwich"
+    class="w-24 h-24 object-cover rounded flex-shrink-0 mt-0 mb-0"
+  />
 
-				<!-- Content -->
-				<div class="flex-1">
-					{#if sandwich.name}
-						<p
-							class="font-bold text-md mb-1 mt-0"
-							title={sandwich.name.replace(/^["']|["']$/g, "")}
-						>
-							{sandwich.name.replace(/^["']|["']$/g, "").slice(0, 80)}{sandwich
-								.name.length > 80
-								? "…"
-								: ""}
-						</p>
-					{/if}
+  <!-- Content -->
+  <div class="flex-1">
+    {#if sandwich.name}
+      <p
+        class="font-bold text-md mb-1 mt-0 leading-4"
+        title={sandwich.name.replace(/^["']|["']$/g, "")}
+      >
+        {sandwich.name.replace(/^["']|["']$/g, "").slice(0, 80)}{sandwich
+          .name.length > 80
+          ? "…"
+          : ""}
+      </p>
+    {/if}
 
-					<div class="mb-1 flex items-center gap-2 h-5">
-						<strong>{sandwich.username.replace(/^["']|["']$/g, "")}</strong>
-						<span>rated:</span>
-						<StarRating
-							rate={sandwich.starRating.toString()}
-							alreadyInDB={true}
-							small={true}
-						/>
-					</div>
+    <div class="mb-1 flex flex-wrap items-center gap-2 m-0">
+      <strong class="whitespace-nowrap">
+        {sandwich.username.replace(/^["']|["']$/g, "")}
+      </strong>
+      <span class="whitespace-nowrap">rated:</span>
+      <StarRating
+        rate={sandwich.starRating.toString()}
+        alreadyInDB={true}
+        small={true}
+        class="mt-1 sm:mt-0 h-2"
+      />
+    </div>
 
-					<p class="text-sm text-gray-600 mb-1">
-						{#if sandwich.comments}
-							{sandwich.comments.length > 80
-								? sandwich.comments.slice(0, 80) + "…"
-								: sandwich.comments}
-						{/if}
-					</p>
+    <p class="text-sm text-gray-600 m-0">
+      {#if sandwich.comments}
+        {sandwich.comments.length > 80
+          ? sandwich.comments.slice(0, 80) + "…"
+          : sandwich.comments}
+      {/if}
+    </p>
 
-					<p class="text-sm text-gray-500">
-						{new Date(sandwich.createdAt).toLocaleDateString()}
-					</p>
-				</div>
+    <p class="text-sm text-gray-500 m-0">
+      {new Date(sandwich.createdAt).toLocaleDateString()}
+    </p>
+  </div>
 
-				<!-- Vote Button -->
-				<div class="flex-shrink-0 self-start flex items-center gap-2">
-					<button
-						class="px-3 py-1 rounded text-white"
-						class:bg-red-500={sandwich.hasVoted}
-						class:bg-gray-400={!sandwich.hasVoted}
-						disabled={voteLoading.has(sandwich.sandwichId)}
-						on:click|stopPropagation={() => toggleVote(sandwich)}
-					>
-						{sandwich.hasVoted ? "Unvote ❤️" : "Upvote 🤍"}
-					</button>
-					<span class="text-gray-700 font-medium">{sandwich.voteCount}</span>
-				</div>
-			</div>
+  <!-- Vote Button -->
+  <div
+    class="flex-shrink-0 flex items-center gap-2 order-2 md:order-none md:mt-0"
+  >
+    <button
+      class="px-3 py-1 rounded text-white"
+      class:bg-red-500={sandwich.hasVoted}
+      class:bg-gray-400={!sandwich.hasVoted}
+      disabled={voteLoading.has(sandwich.sandwichId)}
+      on:click|stopPropagation={() => toggleVote(sandwich)}
+    >
+      {sandwich.hasVoted ? "Unvote ❤️" : "Upvote 🤍"}
+    </button>
+    <span class="text-gray-700 font-medium">{sandwich.voteCount}</span>
+  </div>
+</div>
+
 		</div>
 	{/each}
 
