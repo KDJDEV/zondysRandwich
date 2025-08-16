@@ -231,7 +231,14 @@
 				</p>
 			{:else}
 				<p class="text-green-500 font-bold mb-2 text-center">
-					{sandwich.username} has ordered this sandwich before!
+					<span
+						class="cursor-pointer text-blue-500  hover:text-blue-700 underline"
+						on:click={() =>
+							goto(`/dashboard/history?userId=${sandwich.userId}`)}
+					>
+						{sandwich.username}
+					</span>
+					has ordered this sandwich before!
 				</p>
 			{/if}
 		{:else if data.user?.id === sandwich.userId}
