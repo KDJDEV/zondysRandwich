@@ -81,7 +81,7 @@
 						</div>
 					{:else}
 						<p class="text-red-600 mt-2">
-							Sandwich was never rated (does not count towards leaderboard)
+							Sandwich was never rated and will not appear on the Sandwich Feed.
 						</p>
 					{/if}
 				</div>

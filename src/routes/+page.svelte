@@ -14,13 +14,13 @@
 
 	<h2 class="mt-0">How it works:</h2>
 	<ol>
-		<li>Create an account (necessary for saving your randwiches and appearing on the leaderboard).</li>
+		<li>Create an account (necessary for saving your randwiches and appearing on the Sandwich Feed).</li>
 		<li>Generate a randwich from the Dashboard.</li>
 		<li>Order it. Upload a picture of it. Eat it. Love it.</li>
 		<li>Give it a review.</li>
 	</ol>
 	<p>
-		You can create a randwich without an account, but creating an account will help you save your creations and track your progress!
+		You can create a randwich without an account, but creating an account will help you save your creations and share them with others!
 	</p>
 
 	<div>
@@ -37,7 +37,7 @@
 				<!-- Option A: Sign up or Log in -->
 				<div class="border p-6 rounded-lg bg-blue-50 w-full md:w-1/2">
 					<h3 class="text-xl font-semibold mb-4 mt-0">Option A: Create an Account <p class="inline text-sm text-gray-500"> (Recommended)</p></h3> 
-					<p>Sign up to track your sandwich history and make it onto the leaderboard.</p>
+					<p>Sign up to track your sandwich history and make it onto the Sandwich Feed.</p>
 					<div class="flex gap-4">
 						<a href="/signup" class="btn btn-primary text-base-100 font-semibold">Sign Up</a>
 						<a href="/login" class="btn text-base-100 font-semibold">Log In</a>

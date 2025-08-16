@@ -62,7 +62,7 @@
 			<input
 				type="email"
 				name="email"
-				placeholder="Your Taylor email"
+				placeholder="Your Taylor student email"
 				class="input input-bordered w-full"
 				value={form?.email || ""}
 				required

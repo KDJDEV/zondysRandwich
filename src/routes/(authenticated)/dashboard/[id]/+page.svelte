@@ -201,17 +201,17 @@
 		}
 	}
 </script>
+
 <div class="w-full flex justify-start mb-4 px-4">
-      <button
-    class="px-4 py-2 text-white rounded bg-blue-600 hover:bg-blue-700 transition 
+	<button
+		class="px-4 py-2 text-white rounded bg-blue-600 hover:bg-blue-700 transition
            relative lg:absolute lg:mr-50 lg:top-50 lg:left-40
            left-1/2 transform -translate-x-1/2"
-    on:click={() => goto("/dashboard")}
->
-    ← Back to Dashboard
-</button>
-
-    </div>
+		on:click={() => goto("/dashboard")}
+	>
+		← Back to Dashboard
+	</button>
+</div>
 {#if sandwich}
 	{#if created}
 		<div
@@ -248,7 +248,7 @@
 		{#if !sandwich.userId}
 			<p class="text-red-600 mb-5">
 				(This randwich wasn't linked to a user account and can't be given a
-				review or added to the leaderboard. If you created this sandwich and
+				review or added to the Sandwich Feed. If you created this sandwich and
 				would like your future randwiches to count, consider <a
 					href="/signup"
 					class="link text-black">creating an account</a
@@ -271,19 +271,22 @@
 			{toppingsText}
 		</p>
 		<p><strong>🍅 Sauce:</strong> {sandwich.sauce}</p>
-		<div class="mt-4 flex items-center gap-3 m-auto w-fit">
-			<button
-				class="px-4 py-2 rounded text-white font-semibold"
-				class:bg-red-500={sandwich.hasVoted}
-				class:bg-gray-400={!sandwich.hasVoted}
-				disabled={voteLoading}
-				on:click={toggleVote}
-			>
-				{sandwich.hasVoted ? "Unvote ❤️" : "Upvote 🤍"}
-			</button>
-			<span class="text-gray-700 font-medium">{sandwich.voteCount} upvotes</span
-			>
-		</div>
+		{#if sandwich.userId}
+			<div class="mt-4 flex items-center gap-3 m-auto w-fit">
+				<button
+					class="px-4 py-2 rounded text-white font-semibold"
+					class:bg-red-500={sandwich.hasVoted}
+					class:bg-gray-400={!sandwich.hasVoted}
+					disabled={voteLoading}
+					on:click={toggleVote}
+				>
+					{sandwich.hasVoted ? "Unvote ❤️" : "Upvote 🤍"}
+				</button>
+				<span class="text-gray-700 font-medium"
+					>{sandwich.voteCount} upvotes</span
+				>
+			</div>
+		{/if}
 		{#if data.user?.id === sandwich.userId && !alreadyInDB}
 			{#if sandwichesRemaining > 0}
 				<button

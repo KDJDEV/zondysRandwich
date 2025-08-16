@@ -107,7 +107,7 @@
 	{:else}
 		<p class="text-red-600 inline italic">
 			You're not currently logged in. Created randwiches will not be saved to
-			your history or count towards the leaderboard (not recommended).
+			your history or appear on the Sandwich Feed (not recommended).
 		</p>
 		<a href="/login" class="link">Log In</a>
 	{/if}
@@ -116,7 +116,7 @@
 		below to generate one!
 	</p>
 	<div class="text-center">
-		{#if sandwichesRemaining > 0}
+		{#if sandwichesRemaining > 0 || !data.user}
 			<button class="generate" on:click={generateSandwich} disabled={loading}>
 				{#if loading}
 					Generating...

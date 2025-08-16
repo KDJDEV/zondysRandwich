@@ -16,34 +16,41 @@ export const GET = async ({ url, locals }) => {
         isNotNull(sandwiches.imageUrl)
     );
 
-    const orderBy =
-        sort === "upvoted"
-            ? desc(sql`COUNT(${sandwichVotes.id})`)
-            : desc(sandwiches.createdAt);
+   const orderBy =
+  sort === "upvoted"
+    ? [
+        desc(sql`COUNT(${sandwichVotes.id})`), // vote count
+        desc(sandwiches.createdAt),            // break ties by recency
+        desc(sandwiches.id)                    // final unique tiebreaker
+      ]
+    : [
+        desc(sandwiches.createdAt),
+        desc(sandwiches.id) // add ID here too, to make recent stable
+      ];
 
-    const feed = await db
-        .select({
-            sandwichId: sandwiches.id,
-            imageUrl: sandwiches.imageUrl,
-            starRating: sandwiches.starRating,
-            createdAt: sandwiches.createdAt,
-            comments: sandwiches.comments,
-            name:sandwiches.name,
-            userId: users.id,
-            username: users.username,
-            voteCount: sql`COUNT(${sandwichVotes.id})`,
-            hasVoted: userId
-                ? sql`BOOL_OR(${sandwichVotes.userId} = ${userId}::int)`
-                : sql`false`
-        })
-        .from(sandwiches)
-        .leftJoin(users, eq(users.id, sandwiches.userId))
-        .leftJoin(sandwichVotes, eq(sandwiches.id, sandwichVotes.sandwichId))
-        .where(baseWhere)
-        .groupBy(sandwiches.id, users.id)
-        .orderBy(orderBy)
-        .limit(limit)
-        .offset(offset);
+const feed = await db
+  .select({
+    sandwichId: sandwiches.id,
+    imageUrl: sandwiches.imageUrl,
+    starRating: sandwiches.starRating,
+    createdAt: sandwiches.createdAt,
+    comments: sandwiches.comments,
+    name: sandwiches.name,
+    userId: users.id,
+    username: users.username,
+    voteCount: sql`COUNT(${sandwichVotes.id})`,
+    hasVoted: userId
+      ? sql`BOOL_OR(${sandwichVotes.userId} = ${userId}::int)`
+      : sql`false`
+  })
+  .from(sandwiches)
+  .leftJoin(users, eq(users.id, sandwiches.userId))
+  .leftJoin(sandwichVotes, eq(sandwiches.id, sandwichVotes.sandwichId))
+  .where(baseWhere)
+  .groupBy(sandwiches.id, users.id)
+  .orderBy(...orderBy) // spread array
+  .limit(limit)
+  .offset(offset);
 
     return json({
         page,
